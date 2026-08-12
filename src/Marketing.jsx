@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ClerkControls, clerkEnabled } from './clerkAuth'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Float, MeshDistortMaterial, OrbitControls, Sparkles, Stars } from '@react-three/drei'
+import { Float, MeshDistortMaterial, Sparkles, Stars } from '@react-three/drei'
 import { motion } from 'framer-motion'
 
 function Core() {
