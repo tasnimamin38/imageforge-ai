@@ -1,5 +1,10 @@
 # মাইক্রোসাস · MicroSaaS
 
+**Vercel 404?** Production branch must be `arena/019ff725-imageforge-ai` (or merge this branch into `main`). `main` only had a README, so Vercel served `NOT_FOUND`.
+
+Settings → Git → Production Branch → this branch → Redeploy. Add env vars from `.env.example`.
+
+
 AI studio + business OS + Google login + bKash/Nagad credits.
 
 ## Clerk
@@ -37,17 +42,9 @@ npx vercel --prod --yes
 
 Or `VERCEL_TOKEN=... npx vercel --prod --yes`
 
-Add the same env names as `.env.example` in the Vercel project. Set `APP_URL` to the `*.vercel.app` URL after first deploy.
+In the Vercel project add env names from `.env.example`. After first deploy set `APP_URL` to the `*.vercel.app` URL.
 
-## Vercel (GitHub → Deploy)
-
-Yes — connect the repo in Vercel.
-
-1. Import `tasnimamin38/imageforge-ai`
-2. Framework: Vite (auto)
-3. Add **Environment Variables** (same names as `.env.example`) — never commit secrets
-4. Deploy
-5. Google Cloud Console → OAuth client:
+Google Cloud OAuth:
    - Authorized JavaScript origins: `https://YOUR.vercel.app`
    - Redirect URIs: `https://YOUR.vercel.app/api/auth/google/callback`
    - Local: `http://localhost:8787` and `http://localhost:5173` + `/api/auth/google/callback`

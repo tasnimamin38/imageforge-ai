@@ -60,16 +60,20 @@ function seed() {
 }
 
 export function load() {
-  if (!fs.existsSync(DATA)) {
-    const s = seed()
-    fs.writeFileSync(DATA, JSON.stringify(s, null, 2))
-    return s
+  try {
+    if (!fs.existsSync(DATA)) {
+      const s = seed()
+      try { fs.writeFileSync(DATA, JSON.stringify(s, null, 2)) } catch { /* ephemeral */ }
+      return s
+    }
+    return JSON.parse(fs.readFileSync(DATA, 'utf8'))
+  } catch {
+    return seed()
   }
-  return JSON.parse(fs.readFileSync(DATA, 'utf8'))
 }
 
 export function save(db) {
-  fs.writeFileSync(DATA, JSON.stringify(db, null, 2))
+  try { fs.writeFileSync(DATA, JSON.stringify(db, null, 2)) } catch { /* ephemeral */ }
 }
 
 export function audit(db, actor, action, detail) {

@@ -30,8 +30,10 @@ db.users.forEach((u) => {
 
 function publicOrigin(req) {
   if (process.env.APP_URL) return process.env.APP_URL.replace(/\/$/, '')
+  const host = req.get('host') || ''
+  if (host.includes('vercel.app')) return `https://${host}`
   const proto = req.headers['x-forwarded-proto'] || req.protocol || 'http'
-  return `${proto}://${req.get('host')}`
+  return `${proto}://${host}`
 }
 
 function signUser(user) {
