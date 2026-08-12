@@ -113,7 +113,6 @@ export default function Marketing() {
         <a href="#pricing" onClick={() => setOpen(false)}>প্রাইসিং</a>
         <a href="#services" onClick={() => setOpen(false)}>প্ল্যাটফর্ম</a>
         <Link to="/login" onClick={() => setOpen(false)}>লগইন / অ্যাপ</Link>
-        <a href="/api/auth/google" onClick={() => setOpen(false)}>Google সাইন-ইন</a>
       </div>
 
       <header className="hero">
@@ -126,10 +125,10 @@ export default function Marketing() {
           <p className="kicker live-dot"><i /> লাইভ · MicroSaaS · AI · ERP</p>
           <h1>মাইক্রোসাস<span>ইনকাম-রেডি প্ল্যাটফর্ম</span></h1>
           <p className="lede">
-            গুগল লগইন, মাল্টি-মডেল এআই স্টুডিও, ক্রেডিট বিলিং (bKash/Nagad) আর পুরো বিজনেস OS — এক প্রোডাক্টে বিক্রি করুন।
+            গুগল ছাড়াই চলছে: পাসওয়ার্ড লগইন, CRM, বিলিং, স্টুডিও কপিলট।
           </p>
           <div className="hero-actions">
-            <a className="btn primary" href="/api/auth/google">ফ্রি ১৫০ ক্রেডিট</a>
+            <Link className="btn primary" to="/login">অ্যাপ খুলুন</Link>
             <a className="btn ghost" href="#pricing">প্ল্যান দেখুন</a>
           </div>
         </motion.div>

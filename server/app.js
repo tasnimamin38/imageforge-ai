@@ -67,7 +67,7 @@ app.get('/api/health', (_req, res) => {
     ok: true,
     product: 'Microsys',
     version: '3.0.0',
-    google: Boolean(GOOGLE_ID && GOOGLE_SECRET),
+    google: false,
     ai: providersStatus(),
   })
 })
@@ -86,63 +86,12 @@ app.post('/api/auth/login', (req, res) => {
 })
 
 app.get('/api/auth/google', (req, res) => {
-  if (!GOOGLE_ID) return res.status(500).send('Google OAuth not configured')
-  const redirect = `${publicOrigin(req)}/api/auth/google/callback`
-  const url = new URL('https://accounts.google.com/o/oauth2/v2/auth')
-  url.searchParams.set('client_id', GOOGLE_ID)
-  url.searchParams.set('redirect_uri', redirect)
-  url.searchParams.set('response_type', 'code')
-  url.searchParams.set('scope', 'openid email profile')
-  url.searchParams.set('access_type', 'online')
-  url.searchParams.set('prompt', 'select_account')
-  res.redirect(url.toString())
+  const origin = publicOrigin(req)
+  return res.redirect(302, `${origin}/login?disabled=google`)
 })
 
-app.get('/api/auth/google/callback', async (req, res) => {
-  const origin = publicOrigin(req)
-  const redirectUri = `${origin}/api/auth/google/callback`
-  if (req.query.error) return res.redirect(`${origin}/login?err=google`)
-  const code = req.query.code
-  if (!code) return res.redirect(`${origin}/login?err=nocode`)
-  try {
-    const tok = await fetch('https://oauth2.googleapis.com/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        code,
-        client_id: GOOGLE_ID,
-        client_secret: GOOGLE_SECRET,
-        redirect_uri: redirectUri,
-        grant_type: 'authorization_code',
-      }),
-    }).then((r) => r.json())
-    if (!tok.access_token) throw new Error(tok.error || 'token')
-    const profile = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-      headers: { Authorization: `Bearer ${tok.access_token}` },
-    }).then((r) => r.json())
-    let user = db.users.find((u) => u.email === profile.email)
-    if (!user) {
-      user = {
-        id: id('u'),
-        name: profile.name || profile.email,
-        email: profile.email,
-        role: 'member',
-        dept: 'Customer',
-        title: 'Founder',
-        plan: 'starter',
-        credits: PLANS.starter.credits,
-        provider: 'google',
-        picture: profile.picture,
-      }
-      db.users.unshift(user)
-    }
-    audit(db, user.email, 'login', 'google')
-    save(db)
-    const token = signUser(user)
-    res.redirect(`${origin}/oauth#token=${encodeURIComponent(token)}`)
-  } catch {
-    res.redirect(`${origin}/login?err=oauth`)
-  }
+app.get('/api/auth/google/callback', (req, res) => {
+  return res.redirect(302, `${publicOrigin(req)}/login?disabled=google`)
 })
 
 app.get('/api/me', auth, (req, res) => res.json(publicUser(me(req) || req.user)))
@@ -353,10 +302,10 @@ app.get('/api/stats', (_req, res) => {
 })
 app.get('/api/services', (_req, res) => {
   res.json([
-    { id: 'ai', title: 'মাল্টি-মডেল স্টুডিও', en: 'AI Studio', desc: 'Groq, Gemini, OpenRouter, Cerebras — এক ওয়ালেট।' },
-    { id: 'mbp', title: 'বিজনেস OS', en: 'Business OS', desc: 'CRM, ইনভয়েস, স্টক, HR — এসএমইর জন্য।' },
-    { id: 'bill', title: 'ক্রেডিট বিলিং', en: 'Credits', desc: 'bKash/Nagad অর্ডার — বাংলাদেশে আয়।' },
-    { id: 'auth', title: 'গুগল সাইন-ইন', en: 'Google Auth', desc: 'ওয়ান-ক্লিক অনবোর্ড, স্টার্টার ক্রেডিট।' },
+    { id: 'ai', title: 'কপিলট স্টুডিও', en: 'AI Studio', desc: 'লাইভ ERP ডেটা থেকে ব্রিফ — লোকাল কপিলট সবসময় চলে।' },
+    { id: 'mbp', title: 'বিজনেস OS', en: 'Business OS', desc: 'CRM, ইনভয়েস, স্টক, HR — এখনই লগইন করে ব্যবহার করুন।' },
+    { id: 'bill', title: 'ক্রেডিট বিলিং', en: 'Credits', desc: 'bKash/Nagad অর্ডার + অ্যাডমিন কনফার্ম।' },
+    { id: 'auth', title: 'ডেমো সেশন', en: 'Password login', desc: 'admin@microsys.local · Microsys@2026' },
   ])
 })
 

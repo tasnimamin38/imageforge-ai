@@ -47,7 +47,18 @@ export function providersStatus() {
 
 const ORDER = ['groq', 'cerebras', 'openrouter', 'nararouter', 'gemini']
 
+function localBrief(prompt, snapshot) {
+  const arr = snapshot?.arr || 0
+  const overdue = snapshot?.overdue?.length || 0
+  const low = snapshot?.lowStock?.length || 0
+  const risk = snapshot?.atRisk?.length || 0
+  return `MBP Copilot (লাইভ লোকাল)\nপ্রশ্ন: ${prompt}\nARR ৳${Number(arr).toLocaleString()} · ওভারডিউ ইনভয়েস ${overdue} · লো-স্টক ${low} · অ্যাট-রিস্ক প্রজেক্ট ${risk}।\nঅ্যাকশন: কালেকশন কল, MBP-AI রিঅর্ডার, পোর্ট টুইন স্ট্যাটাস মিটিং।`
+}
+
 export async function complete({ provider = 'auto', prompt, snapshot }) {
+  if (provider === 'local' || provider === 'auto') {
+    return { provider: 'local', text: localBrief(prompt, snapshot) }
+  }
   const messages = [
     { role: 'system', content: SYSTEM },
     { role: 'user', content: `${prompt}\n\nERP SNAPSHOT:\n${JSON.stringify(snapshot)}` },
