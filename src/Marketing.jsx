@@ -100,11 +100,11 @@ export default function Marketing() {
       <nav className="nav">
         <div className="brand"><div className="logo" /> মাইক্রোসাস MBP</div>
         <div className="nav-links">
+          <a href="#pricing">প্রাইসিং</a>
           <a href="#services">প্ল্যাটফর্ম</a>
-          <a href="#about">এন্টারপ্রাইজ</a>
-          <Link to="/login">কমান্ড সেন্টার</Link>
+          <Link to="/login">অ্যাপ</Link>
         </div>
-        <Link className="nav-cta" to="/login">MBP লগইন</Link>
+        <a className="nav-cta" href="/api/auth/google">Google দিয়ে শুরু</a>
       </nav>
 
       <header className="hero">
@@ -114,14 +114,14 @@ export default function Marketing() {
           </Canvas>
         </div>
         <motion.div className="hero-copy" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="kicker">Enterprise · ERP · Live 3D</p>
-          <h1>মাইক্রোসাস<span>বিজনেস প্ল্যাটফর্ম</span></h1>
+          <p className="kicker">MicroSaaS · AI · ERP</p>
+          <h1>মাইক্রোসাস<span>ইনকাম-রেডি প্ল্যাটফর্ম</span></h1>
           <p className="lede">
-            CRM, ফাইন্যান্স, ইনভেন্টরি, HR ও প্রজেক্ট — এক কন্ট্রোল প্লেনে। JWT রোল, অডিট লগ, এআই কপিলট।
+            গুগল লগইন, মাল্টি-মডেল এআই স্টুডিও, ক্রেডিট বিলিং (bKash/Nagad) আর পুরো বিজনেস OS — এক প্রোডাক্টে বিক্রি করুন।
           </p>
           <div className="hero-actions">
-            <Link className="btn primary" to="/login">প্রোডাকশন কনসোল</Link>
-            <a className="btn ghost" href="#contact">এন্টারপ্রাইজ ব্রিফ</a>
+            <a className="btn primary" href="/api/auth/google">ফ্রি ১৫০ ক্রেডিট</a>
+            <a className="btn ghost" href="#pricing">প্ল্যান দেখুন</a>
           </div>
         </motion.div>
       </header>

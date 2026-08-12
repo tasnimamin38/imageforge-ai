@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url'
 import bcrypt from 'bcryptjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const DATA = path.join(__dirname, 'data.json')
+const DATA = process.env.VERCEL ? '/tmp/mbp-data.json' : path.join(__dirname, 'data.json')
 
 const now = () => new Date().toISOString()
 const id = (p) => `${p}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`
@@ -13,9 +13,9 @@ function seed() {
   const hash = bcrypt.hashSync('Microsys@2026', 10)
   return {
     users: [
-      { id: 'u_admin', name: 'Amina Rahman', email: 'admin@microsys.local', password: hash, role: 'admin', dept: 'Executive', title: 'CEO' },
-      { id: 'u_fin', name: 'Rafi Chowdhury', email: 'finance@microsys.local', password: hash, role: 'finance', dept: 'Finance', title: 'CFO' },
-      { id: 'u_ops', name: 'Nadia Islam', email: 'ops@microsys.local', password: hash, role: 'ops', dept: 'Operations', title: 'COO' },
+      { id: 'u_admin', name: 'Amina Rahman', email: 'admin@microsys.local', password: hash, role: 'admin', dept: 'Executive', title: 'CEO', plan: 'scale', credits: 12000, provider: 'password' },
+      { id: 'u_fin', name: 'Rafi Chowdhury', email: 'finance@microsys.local', password: hash, role: 'finance', dept: 'Finance', title: 'CFO', plan: 'growth', credits: 2000, provider: 'password' },
+      { id: 'u_ops', name: 'Nadia Islam', email: 'ops@microsys.local', password: hash, role: 'ops', dept: 'Operations', title: 'COO', plan: 'starter', credits: 150, provider: 'password' },
     ],
     customers: [
       { id: 'c1', name: 'Bengal Logistics', industry: 'Supply Chain', city: 'Chattogram', arr: 4200000, status: 'active', owner: 'Nadia Islam' },
@@ -54,6 +54,8 @@ function seed() {
     ],
     audit: [{ at: now(), actor: 'system', action: 'seed', detail: 'MBP tenant initialized' }],
     messages: [],
+    orders: [],
+    chats: [],
   }
 }
 

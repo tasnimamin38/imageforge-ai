@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 
 export default function Login() {
   const nav = useNavigate()
+  const [params] = useSearchParams()
   const [email, setEmail] = useState('admin@microsys.local')
   const [password, setPassword] = useState('Microsys@2026')
-  const [err, setErr] = useState('')
+  const [err, setErr] = useState(params.get('err') ? 'গুগল লগইন হয়নি — কনসোলে রিডাইরেক্ট URI যোগ করুন' : '')
 
   async function submit(e) {
     e.preventDefault()
@@ -24,14 +25,16 @@ export default function Login() {
   return (
     <div className="login-wrap">
       <form className="login-card" onSubmit={submit}>
-        <div className="brand"><div className="logo" /> মাইক্রোসাস MBP</div>
-        <h2>কমান্ড সেন্টার</h2>
-        <p>এন্টারপ্রাইজ সেশন · JWT ১২ ঘণ্টা</p>
+        <div className="brand"><div className="logo" /> মাইক্রোসাস</div>
+        <h2>মাইক্রোসাস প্ল্যাটফর্ম</h2>
+        <p>গুগল দিয়ে শুরু করুন — ১৫০ ফ্রি ক্রেডিট</p>
+        <a className="btn primary" href="/api/auth/google">Google দিয়ে প্রবেশ</a>
+        <p className="hint">অথবা ডেমো অ্যাডমিন</p>
         <input value={email} onChange={(e) => setEmail(e.target.value)} />
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        <button className="btn primary" type="submit">প্রবেশ</button>
+        <button className="btn ghost" type="submit">পাসওয়ার্ড লগইন</button>
         {err && <p className="form-note">{err}</p>}
-        <p className="hint">finance@ / ops@ একই পাসওয়ার্ড · <Link to="/">মার্কেটিং</Link></p>
+        <p className="hint"><Link to="/">হোম</Link></p>
       </form>
     </div>
   )

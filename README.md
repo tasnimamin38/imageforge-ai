@@ -1,26 +1,34 @@
-# মাইক্রোসাস MBP · Enterprise Business Platform
+# মাইক্রোসাস · MicroSaaS
 
-Production-style ERP: marketing site + authenticated command center.
+AI studio + business OS + Google login + bKash/Nagad credits.
+
+## Local
 
 ```bash
+cp .env.example .env
 npm install
 npm run dev
 ```
 
-Open `/` for the 3D site, `/login` for MBP.
+Demo: `admin@microsys.local` / `Microsys@2026`
 
-**Demo**
-- `admin@microsys.local` / `Microsys@2026`
-- `finance@microsys.local` / `Microsys@2026`
-- `ops@microsys.local` / `Microsys@2026` (HR write blocked)
+## Vercel (GitHub → Deploy)
 
-**API keys (optional)**  
-Copy `.env.example` → `.env` on the server process.
+Yes — connect the repo in Vercel.
 
-| Key | What it unlocks |
-|-----|-----------------|
-| `OPENAI_API_KEY` | Live copilot briefs (`POST /api/ai/brief`) |
-| `JWT_SECRET` | Signed sessions (required in real prod) |
-| Stripe / Resend / SMTP | Can be wired for billing & mail when you add them |
+1. Import `tasnimamin38/imageforge-ai`
+2. Framework: Vite (auto)
+3. Add **Environment Variables** (same names as `.env.example`) — never commit secrets
+4. Deploy
+5. Google Cloud Console → OAuth client:
+   - Authorized JavaScript origins: `https://YOUR.vercel.app`
+   - Redirect URIs: `https://YOUR.vercel.app/api/auth/google/callback`
+   - Local: `http://localhost:8787` and `http://localhost:5173` + `/api/auth/google/callback`
 
-Without OpenAI, copilot still answers from live ERP totals (local mode).
+Set `APP_URL` to the Vercel URL so OAuth redirects stay on the live domain.
+
+**Note:** file JSON DB is fine for demo. For real customers use Vercel Postgres / Neon. Serverless `/tmp` resets.
+
+## Income
+
+Growth ৳2990 / Scale ৳12900 — customers pay bKash/Nagad, paste trx, you confirm in Billing (admin).

@@ -3,6 +3,8 @@ import { useMemo } from 'react'
 
 const links = [
   ['', 'কমান্ড'],
+  ['studio', 'স্টুডিও'],
+  ['billing', 'বিলিং'],
   ['crm', 'CRM'],
   ['inventory', 'ইনভেন্টরি'],
   ['finance', 'ফাইন্যান্স'],
