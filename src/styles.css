@@ -36,6 +36,29 @@ button, input, textarea { font-family: inherit; }
   box-shadow: 0 0 24px rgba(109,94,252,.55);
 }
 .nav-links { display: flex; gap: 18px; color: var(--muted); font-size: 14px; }
+.nav-links a, .nav-cta, .btn { touch-action: manipulation; }
+.live-dot {
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.live-dot i {
+  width: 8px; height: 8px; border-radius: 50%; background: #3ee0c8;
+  box-shadow: 0 0 12px #3ee0c8; animation: pulse 1.4s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .45; transform: scale(0.75); }
+}
+.menu-btn {
+  display: none; border: 0; background: rgba(255,255,255,.08); color: white;
+  border-radius: 10px; padding: 8px 12px; cursor: pointer; z-index: 50;
+}
+.drawer {
+  display: none; position: fixed; inset: 80px 18px auto; z-index: 45;
+  background: #0b0e1c; border: 1px solid rgba(255,255,255,.1); border-radius: 18px;
+  padding: 14px; flex-direction: column; gap: 10px;
+}
+.drawer.open { display: flex; }
+.drawer a { padding: 12px; border-radius: 12px; background: rgba(255,255,255,.04); }
 .nav-cta {
   border: 0; border-radius: 999px; padding: 10px 16px; cursor: pointer;
   color: #061018; font-weight: 700;
@@ -47,8 +70,8 @@ button, input, textarea { font-family: inherit; }
   display: grid; place-items: end start;
   padding: 18vh 8vw 10vh;
 }
-.canvas-wrap { position: absolute; inset: 0; z-index: 0; }
-.hero-copy { position: relative; z-index: 2; max-width: 720px; }
+.canvas-wrap { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.hero-copy { position: relative; z-index: 2; max-width: 720px; pointer-events: auto; }
 .kicker {
   color: var(--cyan); letter-spacing: .22em; text-transform: uppercase;
   font-size: 12px; margin-bottom: 14px;
@@ -119,6 +142,9 @@ footer {
 
 @media (max-width: 860px) {
   .nav-links { display: none; }
+  .menu-btn { display: block; }
   .about { grid-template-columns: 1fr; }
   .stats { grid-template-columns: 1fr; }
+  .hero-actions { flex-direction: column; }
+  .btn, .nav-cta { text-align: center; min-height: 48px; display: inline-flex; align-items: center; justify-content: center; }
 }

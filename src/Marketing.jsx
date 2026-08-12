@@ -41,7 +41,7 @@ function Scene() {
       <Stars radius={80} depth={40} count={2200} factor={3} fade speed={0.8} />
       <Sparkles count={80} scale={10} size={3} speed={0.4} color="#c9c4ff" />
       <Core />
-      <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.6} />
+      {/* no OrbitControls — they steal mobile taps */}
     </>
   )
 }
@@ -66,6 +66,7 @@ export default function Marketing() {
   const [services, setServices] = useState([])
   const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [note, setNote] = useState('')
+  const [open, setOpen] = useState(false)
 
   useEffect(() => {
     fetch('/api/stats').then((r) => r.json()).then(setStats).catch(() => {})
@@ -99,14 +100,21 @@ export default function Marketing() {
   return (
     <>
       <nav className="nav">
-        <div className="brand"><div className="logo" /> মাইক্রোসাস MBP</div>
+        <Link className="brand" to="/"><div className="logo" /> মাইক্রোসাস MBP</Link>
         <div className="nav-links">
           <a href="#pricing">প্রাইসিং</a>
           <a href="#services">প্ল্যাটফর্ম</a>
           <Link to="/login">অ্যাপ</Link>
         </div>
-        {clerkEnabled ? <ClerkControls compact /> : <a className="nav-cta" href="/api/auth/google">Google দিয়ে শুরু</a>}
+        {clerkEnabled ? <ClerkControls compact /> : <Link className="nav-cta" to="/login">অ্যাপ খুলুন</Link>}
+        <button type="button" className="menu-btn" onClick={() => setOpen((v) => !v)} aria-label="মেনু">☰</button>
       </nav>
+      <div className={`drawer ${open ? 'open' : ''}`}>
+        <a href="#pricing" onClick={() => setOpen(false)}>প্রাইসিং</a>
+        <a href="#services" onClick={() => setOpen(false)}>প্ল্যাটফর্ম</a>
+        <Link to="/login" onClick={() => setOpen(false)}>লগইন / অ্যাপ</Link>
+        <a href="/api/auth/google" onClick={() => setOpen(false)}>Google সাইন-ইন</a>
+      </div>
 
       <header className="hero">
         <div className="canvas-wrap">
@@ -115,7 +123,7 @@ export default function Marketing() {
           </Canvas>
         </div>
         <motion.div className="hero-copy" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="kicker">MicroSaaS · AI · ERP</p>
+          <p className="kicker live-dot"><i /> লাইভ · MicroSaaS · AI · ERP</p>
           <h1>মাইক্রোসাস<span>ইনকাম-রেডি প্ল্যাটফর্ম</span></h1>
           <p className="lede">
             গুগল লগইন, মাল্টি-মডেল এআই স্টুডিও, ক্রেডিট বিলিং (bKash/Nagad) আর পুরো বিজনেস OS — এক প্রোডাক্টে বিক্রি করুন।
@@ -138,7 +146,7 @@ export default function Marketing() {
         <p className="section-sub">এক টেনান্ট, সম্পূর্ণ অপারেটিং সিস্টেম।</p>
         <div className="grid">
           {services.map((s) => (
-            <article className="card" key={s.id}>
+            <article className="card" key={s.id} onClick={() => { window.location.href = '/login' }} style={{ cursor: 'pointer' }}>
               <small>{s.en}</small>
               <h3>{s.title}</h3>
               <p>{s.desc}</p>
