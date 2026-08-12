@@ -24,6 +24,23 @@ Demo: `admin@microsys.local` / `Microsys@2026`
 
 ## Vercel (GitHub → Deploy)
 
+This sandbox cannot reach `api.vercel.com` (TLS blocked), so deploy from your machine or the Vercel dashboard.
+
+**Easiest:** [vercel.com/new](https://vercel.com/new) → Import `tasnimamin38/imageforge-ai` → branch `arena/019ff725-imageforge-ai`.
+
+**CLI (your PC):**
+
+```bash
+npx vercel login
+npx vercel --prod --yes
+```
+
+Or `VERCEL_TOKEN=... npx vercel --prod --yes`
+
+Add the same env names as `.env.example` in the Vercel project. Set `APP_URL` to the `*.vercel.app` URL after first deploy.
+
+## Vercel (GitHub → Deploy)
+
 Yes — connect the repo in Vercel.
 
 1. Import `tasnimamin38/imageforge-ai`
