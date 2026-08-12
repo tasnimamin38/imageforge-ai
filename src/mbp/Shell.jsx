@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { useMemo } from 'react'
+import { ClerkControls, clerkEnabled, useClerkProfile } from '../clerkAuth'
 
 const links = [
   ['', 'কমান্ড'],
@@ -13,11 +13,29 @@ const links = [
   ['settings', 'কন্ট্রোল'],
 ]
 
+function LocalIdentity() {
+  let user = {}
+  try { user = JSON.parse(localStorage.getItem('mbp_user') || '{}') } catch { /* ignore */ }
+  return (
+    <div>
+      <strong>{user.name || 'গেস্ট'}</strong>
+      <span>{user.role} · {user.dept || 'Microsys'}</span>
+    </div>
+  )
+}
+
+function ClerkIdentity() {
+  const user = useClerkProfile() || {}
+  return (
+    <div>
+      <strong>{user.name || 'মেম্বার'}</strong>
+      <span>{user.email || 'Clerk'}</span>
+    </div>
+  )
+}
+
 export default function Shell() {
   const nav = useNavigate()
-  const user = useMemo(() => {
-    try { return JSON.parse(localStorage.getItem('mbp_user') || '{}') } catch { return {} }
-  }, [])
 
   function out() {
     localStorage.removeItem('mbp_token')
@@ -32,14 +50,11 @@ export default function Shell() {
         {links.map(([to, label]) => (
           <NavLink key={to || 'home'} end={to === ''} to={to ? `/app/${to}` : '/app'}>{label}</NavLink>
         ))}
-        <button type="button" className="out" onClick={out}>সাইন আউট</button>
+        {clerkEnabled ? <div className="pad-sm"><ClerkControls compact /></div> : <button type="button" className="out" onClick={out}>সাইন আউট</button>}
       </aside>
       <main>
         <header className="mbp-top">
-          <div>
-            <strong>{user.name}</strong>
-            <span>{user.role} · {user.dept || 'Microsys'}</span>
-          </div>
+          {clerkEnabled ? <ClerkIdentity /> : <LocalIdentity />}
           <em>TENANT · microsys-prod</em>
         </header>
         <Outlet />

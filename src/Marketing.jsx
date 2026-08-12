@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ClerkControls, clerkEnabled } from './clerkAuth'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Float, MeshDistortMaterial, OrbitControls, Sparkles, Stars } from '@react-three/drei'
 import { motion } from 'framer-motion'
@@ -104,7 +105,7 @@ export default function Marketing() {
           <a href="#services">প্ল্যাটফর্ম</a>
           <Link to="/login">অ্যাপ</Link>
         </div>
-        <a className="nav-cta" href="/api/auth/google">Google দিয়ে শুরু</a>
+        {clerkEnabled ? <ClerkControls compact /> : <a className="nav-cta" href="/api/auth/google">Google দিয়ে শুরু</a>}
       </nav>
 
       <header className="hero">

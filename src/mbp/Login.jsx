@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
+import { ClerkControls, clerkEnabled } from '../clerkAuth'
 
 export default function Login() {
   const nav = useNavigate()
@@ -27,8 +28,8 @@ export default function Login() {
       <form className="login-card" onSubmit={submit}>
         <div className="brand"><div className="logo" /> মাইক্রোসাস</div>
         <h2>মাইক্রোসাস প্ল্যাটফর্ম</h2>
-        <p>গুগল দিয়ে শুরু করুন — ১৫০ ফ্রি ক্রেডিট</p>
-        <a className="btn primary" href="/api/auth/google">Google দিয়ে প্রবেশ</a>
+        <p>{clerkEnabled ? 'Clerk অ্যাকাউন্ট দিয়ে সাইন আপ করুন' : 'গুগল দিয়ে শুরু করুন — ১৫০ ফ্রি ক্রেডিট'}</p>
+        {clerkEnabled ? <ClerkControls /> : <a className="btn primary" href="/api/auth/google">Google দিয়ে প্রবেশ</a>}
         <p className="hint">অথবা ডেমো অ্যাডমিন</p>
         <input value={email} onChange={(e) => setEmail(e.target.value)} />
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />

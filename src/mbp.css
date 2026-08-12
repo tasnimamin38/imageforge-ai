@@ -8,6 +8,9 @@
 }
 .login-card h2 { font-size: 28px; }
 .login-card p, .hint { color: var(--muted); font-size: 14px; }
+.clerk-bar { display: flex; gap: 8px; align-items: center; }
+.clerk-bar.compact { transform: scale(0.95); }
+.pad-sm { padding: 8px 4px; }
 
 .mbp { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
 .mbp aside {

@@ -2,6 +2,16 @@
 
 AI studio + business OS + Google login + bKash/Nagad credits.
 
+## Clerk
+
+App: `app_3HpXHtjwJ74gFTgIx8dk08Xm6QT`
+
+1. Dashboard → API keys → copy **Publishable key** into `VITE_CLERK_PUBLISHABLE_KEY`
+2. Put `CLERK_SECRET_KEY` only on the server / Vercel (never in the browser)
+3. Allowed origins: your Vercel URL and `http://localhost:5173`
+
+Then nav shows **সাইন ইন / সাইন আপ** and a profile button after signup.
+
 ## Local
 
 ```bash

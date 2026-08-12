@@ -13,8 +13,10 @@ import Studio from './mbp/Studio'
 import Billing from './mbp/Billing'
 import OAuth from './OAuth'
 import { token } from './api'
+import { clerkEnabled, ClerkGuard, ClerkSignInPage, ClerkSignUpPage } from './clerkAuth'
 
 function Guard({ children }) {
+  if (clerkEnabled) return <ClerkGuard>{children}</ClerkGuard>
   if (!token()) return <Navigate to="/login" replace />
   return children
 }
@@ -24,6 +26,8 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Marketing />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/sign-in/*" element={<ClerkSignInPage />} />
+      <Route path="/sign-up/*" element={<ClerkSignUpPage />} />
       <Route path="/oauth" element={<OAuth />} />
       <Route
         path="/app"
