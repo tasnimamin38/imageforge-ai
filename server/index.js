@@ -4,7 +4,11 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
+import { loadEnv } from './loadEnv.js'
 import { load, save, audit, id } from './store.js'
+import { complete, providersStatus } from './ai.js'
+
+loadEnv()
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -38,7 +42,7 @@ app.get('/api/health', (_req, res) => {
     ok: true,
     product: 'Microsys MBP',
     version: '2.0.0',
-    ai: Boolean(process.env.OPENAI_API_KEY),
+    ai: providersStatus(),
   })
 })
 
@@ -160,37 +164,27 @@ app.get('/api/users', auth, (req, res) => {
   res.json({ users: db.users.map(publicUser), audit: db.audit.slice(0, 40) })
 })
 
+app.get('/api/ai/providers', auth, (_req, res) => {
+  res.json(providersStatus())
+})
+
 app.post('/api/ai/brief', auth, async (req, res) => {
-  const key = process.env.OPENAI_API_KEY
   const prompt = req.body?.prompt || 'Summarize company health'
+  const provider = req.body?.provider || 'auto'
   const snapshot = {
     arr: db.customers.reduce((s, c) => s + c.arr, 0),
     overdue: db.invoices.filter((i) => i.status === 'overdue'),
     lowStock: db.products.filter((p) => p.stock <= p.reorder),
     atRisk: db.projects.filter((p) => p.status === 'at-risk'),
-  }
-  if (!key) {
-    return res.json({
-      provider: 'local',
-      text: `MBP Copilot (local): ARR ৳${snapshot.arr.toLocaleString()}। ${snapshot.overdue.length} ওভারডিউ ইনভয়েস, ${snapshot.lowStock.length} লো-স্টক SKU, ${snapshot.atRisk.length} অ্যাট-রিস্ক প্রজেক্ট। অগ্রাধিকার: পোর্ট টুইন রিস্ক মিটিগেট, INV-1044 কালেকশন, MBP-AI রিঅর্ডার। প্রশ্ন: ${prompt}`,
-    })
+    customers: db.customers.map((c) => ({ name: c.name, arr: c.arr, status: c.status })),
   }
   try {
-    const r = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: 'You are Microsys MBP copilot. Be concise, bilingual BN/EN, executive tone.' },
-          { role: 'user', content: `${prompt}\n\nDATA:${JSON.stringify(snapshot)}` },
-        ],
-      }),
-    })
-    const j = await r.json()
-    res.json({ provider: 'openai', text: j.choices?.[0]?.message?.content || 'No response' })
+    const out = await complete({ provider, prompt, snapshot })
+    audit(db, req.user.email, 'ai.brief', out.provider)
+    save(db)
+    res.json(out)
   } catch (e) {
-    res.status(502).json({ error: 'AI upstream failed' })
+    res.status(502).json({ error: e.message || 'AI failed' })
   }
 })
 

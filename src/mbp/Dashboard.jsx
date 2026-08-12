@@ -5,16 +5,19 @@ export default function Dashboard() {
   const [d, setD] = useState(null)
   const [ai, setAi] = useState('')
   const [q, setQ] = useState('কোম্পানির স্বাস্থ্য সংক্ষেপে বলুন')
+  const [provider, setProvider] = useState('auto')
+  const [ready, setReady] = useState({})
 
   useEffect(() => {
     api('/api/dashboard').then(setD).catch(() => {})
+    api('/api/ai/providers').then(setReady).catch(() => {})
   }, [])
 
   async function brief(e) {
     e.preventDefault()
     setAi('কপিলট ভাবছে…')
     try {
-      const r = await api('/api/ai/brief', { method: 'POST', body: JSON.stringify({ prompt: q }) })
+      const r = await api('/api/ai/brief', { method: 'POST', body: JSON.stringify({ prompt: q, provider }) })
       setAi(`${r.provider}: ${r.text}`)
     } catch (err) {
       setAi(err.message)
@@ -48,6 +51,12 @@ export default function Dashboard() {
         <section className="panel">
           <h3>এআই কপিলট</h3>
           <form onSubmit={brief} className="row">
+            <select value={provider} onChange={(e) => setProvider(e.target.value)}>
+              <option value="auto">auto</option>
+              {['groq', 'cerebras', 'openrouter', 'nararouter', 'gemini'].map((p) => (
+                <option key={p} value={p}>{p}{ready[p] ? '' : ' (off)'}</option>
+              ))}
+            </select>
             <input value={q} onChange={(e) => setQ(e.target.value)} />
             <button className="btn primary" type="submit">ব্রিফ</button>
           </form>
