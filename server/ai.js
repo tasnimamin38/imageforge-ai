@@ -1,116 +1,162 @@
-const SYSTEM = 'You are Microsys MBP copilot. Concise, bilingual Bengali/English, executive tone. Use the ERP snapshot. Never invent secrets.'
+const SYSTEM =
+  'You are ImageForge AI, a neuro-marketing strategist. Concise, bilingual Bengali/English when useful. Only digital marketing assets. Never invent secrets, fake testimonials, or physical inventory. If context is missing, ask one sharp question then still give a useful first draft.'
 
-async function openaiCompat({ url, key, model, extraHeaders = {}, messages }) {
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${key}`,
-      'Content-Type': 'application/json',
-      ...extraHeaders,
-    },
-    body: JSON.stringify({ model, messages, temperature: 0.4, max_tokens: 700 }),
-  })
-  const j = await r.json().catch(() => ({}))
-  if (!r.ok) {
-    const msg = j.error?.message || j.message || `HTTP ${r.status}`
-    throw new Error(msg)
+const ORDER = ['groq', 'cerebras', 'openrouter', 'nararouter', 'gemini']
+
+function envKey(name) {
+  const map = {
+    groq: process.env.GROQ_API_KEY,
+    cerebras: process.env.CEREBRAS_API_KEY,
+    openrouter: process.env.OPENROUTER_API_KEY,
+    nararouter: process.env.NARAROUTER_API_KEY,
+    gemini: process.env.GEMINI_API_KEY,
   }
-  const text = j.choices?.[0]?.message?.content
-  if (!text) throw new Error('Empty completion')
-  return text
-}
-
-async function gemini({ key, messages }) {
-  const prompt = messages.map((m) => `${m.role}: ${m.content}`).join('\n\n')
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-  })
-  const j = await r.json().catch(() => ({}))
-  if (!r.ok) throw new Error(j.error?.message || `Gemini HTTP ${r.status}`)
-  const text = j.candidates?.[0]?.content?.parts?.map((p) => p.text).join('') 
-  if (!text) throw new Error('Empty Gemini response')
-  return text
+  return (map[name] || '').trim()
 }
 
 export function providersStatus() {
   return {
-    groq: Boolean(process.env.GROQ_API_KEY),
-    cerebras: Boolean(process.env.CEREBRAS_API_KEY),
-    openrouter: Boolean(process.env.OPENROUTER_API_KEY),
-    nararouter: Boolean(process.env.NARAROUTER_API_KEY),
-    gemini: Boolean(process.env.GEMINI_API_KEY),
+    groq: Boolean(envKey('groq')),
+    cerebras: Boolean(envKey('cerebras')),
+    openrouter: Boolean(envKey('openrouter')),
+    nararouter: Boolean(envKey('nararouter')),
+    gemini: Boolean(envKey('gemini')),
   }
 }
 
-const ORDER = ['groq', 'cerebras', 'openrouter', 'nararouter', 'gemini']
-
-function localBrief(prompt, snapshot) {
-  const arr = snapshot?.arr || 0
-  const overdue = snapshot?.overdue?.length || 0
-  const low = snapshot?.lowStock?.length || 0
-  const risk = snapshot?.atRisk?.length || 0
-  return `MBP Copilot (লাইভ লোকাল)\nপ্রশ্ন: ${prompt}\nARR ৳${Number(arr).toLocaleString()} · ওভারডিউ ইনভয়েস ${overdue} · লো-স্টক ${low} · অ্যাট-রিস্ক প্রজেক্ট ${risk}।\nঅ্যাকশন: কালেকশন কল, MBP-AI রিঅর্ডার, পোর্ট টুইন স্ট্যাটাস মিটিং।`
+export function liveProviderCount() {
+  return Object.values(providersStatus()).filter(Boolean).length
 }
 
-export async function complete({ provider = 'auto', prompt, snapshot }) {
-  if (provider === 'local' || provider === 'auto') {
-    return { provider: 'local', text: localBrief(prompt, snapshot) }
+async function openaiCompat({ url, key, model, extraHeaders = {}, messages }) {
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), 28000)
+  try {
+    const r = await fetch(url, {
+      method: 'POST',
+      signal: ctrl.signal,
+      headers: {
+        Authorization: `Bearer ${key}`,
+        'Content-Type': 'application/json',
+        ...extraHeaders,
+      },
+      body: JSON.stringify({ model, messages, temperature: 0.55, max_tokens: 1400 }),
+    })
+    const j = await r.json().catch(() => ({}))
+    if (!r.ok) {
+      const msg = j.error?.message || j.message || j.error || `HTTP ${r.status}`
+      throw new Error(typeof msg === 'string' ? msg : JSON.stringify(msg))
+    }
+    const text = j.choices?.[0]?.message?.content
+    if (!text) throw new Error('Empty completion')
+    return text
+  } finally {
+    clearTimeout(timer)
   }
-  const messages = [
-    { role: 'system', content: SYSTEM },
-    { role: 'user', content: `${prompt}\n\nERP SNAPSHOT:\n${JSON.stringify(snapshot)}` },
-  ]
-  const catalog = {
-    groq: () => openaiCompat({
+}
+
+async function gemini({ key, messages }) {
+  const prompt = messages.map((m) => `${m.role.toUpperCase()}:\n${m.content}`).join('\n\n')
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), 28000)
+  try {
+    const r = await fetch(url, {
+      method: 'POST',
+      signal: ctrl.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.55, maxOutputTokens: 1400 },
+      }),
+    })
+    const j = await r.json().catch(() => ({}))
+    if (!r.ok) throw new Error(j.error?.message || `Gemini HTTP ${r.status}`)
+    const text = j.candidates?.[0]?.content?.parts?.map((p) => p.text).join('')
+    if (!text) throw new Error('Empty Gemini response')
+    return text
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+const CATALOG = {
+  groq: (messages) =>
+    openaiCompat({
       url: 'https://api.groq.com/openai/v1/chat/completions',
-      key: process.env.GROQ_API_KEY,
-      model: 'llama-3.3-70b-versatile',
+      key: envKey('groq'),
+      model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
       messages,
     }),
-    cerebras: () => openaiCompat({
+  cerebras: (messages) =>
+    openaiCompat({
       url: 'https://api.cerebras.ai/v1/chat/completions',
-      key: process.env.CEREBRAS_API_KEY,
-      model: 'llama3.1-8b',
+      key: envKey('cerebras'),
+      model: process.env.CEREBRAS_MODEL || 'llama3.1-8b',
       messages,
     }),
-    openrouter: () => openaiCompat({
+  openrouter: (messages) =>
+    openaiCompat({
       url: 'https://openrouter.ai/api/v1/chat/completions',
-      key: process.env.OPENROUTER_API_KEY,
-      model: 'openai/gpt-4o-mini',
-      extraHeaders: { 'HTTP-Referer': 'https://microsys.local', 'X-Title': 'Microsys MBP' },
+      key: envKey('openrouter'),
+      model: process.env.OPENROUTER_MODEL || 'openai/gpt-4o-mini',
+      extraHeaders: {
+        'HTTP-Referer': process.env.APP_URL || 'https://imageforge-ai.vercel.app',
+        'X-Title': 'ImageForge AI',
+      },
       messages,
     }),
-    nararouter: () => openaiCompat({
+  nararouter: (messages) =>
+    openaiCompat({
       url: 'https://router.naraya.ai/v1/chat/completions',
-      key: process.env.NARAROUTER_API_KEY,
-      model: 'deepseek-3.2',
+      key: envKey('nararouter'),
+      model: process.env.NARAROUTER_MODEL || 'deepseek-3.2',
       messages,
     }),
-    gemini: () => gemini({ key: process.env.GEMINI_API_KEY, messages }),
+  gemini: (messages) => gemini({ key: envKey('gemini'), messages }),
+}
+
+export async function complete({ provider = 'auto', prompt, system, context }) {
+  const q = String(prompt || '').trim()
+  if (!q) throw new Error('প্রম্পট খালি')
+
+  const messages = [
+    { role: 'system', content: system || SYSTEM },
+    {
+      role: 'user',
+      content: context ? `${q}\n\nCONTEXT:\n${typeof context === 'string' ? context : JSON.stringify(context)}` : q,
+    },
+  ]
+
+  if (provider === 'local') {
+    throw new Error('লোকাল ডেমো বন্ধ। একটি লাইভ প্রোভাইডার বাছুন অথবা auto ব্যবহার করুন।')
   }
 
-  const wanted = provider && provider !== 'auto' ? [provider] : ORDER
+  const status = providersStatus()
+  const wanted = provider && provider !== 'auto' ? [provider] : ORDER.filter((name) => status[name])
+
+  if (!wanted.length) {
+    throw new Error('কোনো AI কী সেট নেই। Vercel Environment Variables-এ GROQ/OPENROUTER/GEMINI ইত্যাদি দিন।')
+  }
+
   const errors = []
   for (const name of wanted) {
-    const fn = catalog[name]
+    const fn = CATALOG[name]
     if (!fn) {
       errors.push(`${name}: unknown`)
       continue
     }
-    const ready = providersStatus()[name]
-    if (!ready) {
+    if (!status[name]) {
       errors.push(`${name}: no key`)
       continue
     }
     try {
-      const text = await fn()
-      return { provider: name, text }
+      const text = await fn(messages)
+      return { provider: name, text, live: true }
     } catch (e) {
-      errors.push(`${name}: ${e.message}`)
+      errors.push(`${name}: ${e.name === 'AbortError' ? 'timeout' : e.message}`)
     }
   }
-  return { provider: 'local', text: `সব আপস্ট্রিম ব্যর্থ। ${errors.join(' | ')}` }
+
+  throw new Error(`লাইভ প্রোভাইডার ব্যর্থ — ${errors.join(' | ')}`)
 }

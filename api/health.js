@@ -1,5 +1,5 @@
 export default function handler(_req, res) {
   res.statusCode = 200
   res.setHeader('Content-Type', 'application/json')
-  res.end(JSON.stringify({ ok: true, product: 'Microsys', host: 'vercel' }))
+  res.end(JSON.stringify({ ok: true, product: 'ImageForge AI', host: 'vercel' }))
 }

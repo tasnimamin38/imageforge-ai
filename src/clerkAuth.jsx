@@ -1,5 +1,6 @@
 import { Show, SignIn, SignInButton, SignUp, SignUpButton, UserButton, useAuth, useUser } from '@clerk/react'
 import { Navigate } from 'react-router-dom'
+import { token } from './api'
 
 export const clerkEnabled = Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY)
 
@@ -25,7 +26,7 @@ export function ClerkControls({ compact }) {
 export function ClerkGuard({ children }) {
   const { isLoaded, isSignedIn } = useAuth()
   if (!isLoaded) return <div className="login-wrap"><p>সেশন চেক…</p></div>
-  if (isSignedIn || localStorage.getItem('mbp_token')) return children
+  if (isSignedIn || token()) return children
   return <Navigate to="/login" replace />
 }
 
@@ -39,7 +40,7 @@ export function ClerkSignInPage() {
 }
 
 export function ClerkSignUpPage() {
-  if (!clerkEnabled) return <Navigate to="/login" replace />
+  if (!clerkEnabled) return <Navigate to="/signup" replace />
   return (
     <div className="login-wrap">
       <SignUp routing="path" path="/sign-up" signInUrl="/sign-in" afterSignUpUrl="/app" />
@@ -54,6 +55,5 @@ export function useClerkProfile() {
     name: user.fullName || user.primaryEmailAddress?.emailAddress,
     email: user.primaryEmailAddress?.emailAddress,
     role: 'member',
-    dept: 'Clerk',
   }
 }

@@ -1,29 +1,33 @@
 import { useEffect, useState } from 'react'
-import { api } from '../api'
+import { api, currentUser } from '../api'
 
 export default function Billing() {
   const [plans, setPlans] = useState([])
   const [orders, setOrders] = useState([])
   const [pay, setPay] = useState(null)
   const [trx, setTrx] = useState('')
-  const user = JSON.parse(localStorage.getItem('mbp_user') || '{}')
+  const [me, setMe] = useState(currentUser())
 
   const load = () => {
     api('/api/plans').then(setPlans).catch(() => {})
     api('/api/billing/orders').then((d) => setOrders(d.orders)).catch(() => {})
+    api('/api/me').then((u) => {
+      setMe(u)
+      localStorage.setItem('if_user', JSON.stringify(u))
+    }).catch(() => {})
   }
   useEffect(load, [])
 
   return (
     <div className="pad">
-      <h2>বিলিং · আয়</h2>
-      <p className="muted">প্ল্যান {user.plan} · ক্রেডিট {user.credits}</p>
+      <h2>বিলিং</h2>
+      <p className="muted">প্ল্যান {me.plan} · ক্রেডিট {me.credits} · ডিজিটাল টপআপ মাত্র</p>
       <div className="kpi-grid">
         {plans.filter((p) => p.bdt > 0).map((p) => (
           <article key={p.id}>
             <small>{p.tag}</small>
             <b>৳{p.bdt}</b>
-            <p>{p.credits} ক্রেডিট / মাস</p>
+            <p>{p.credits} ক্রেডিট</p>
             <button
               type="button"
               className="btn primary"
@@ -41,7 +45,7 @@ export default function Billing() {
       {pay && (
         <section className="panel">
           <h3>bKash / Nagad</h3>
-          <p>bKash {pay.pay.bkash} · Nagad {pay.pay.nagad}</p>
+          <p>bKash {pay.pay.bkash || 'সেট নেই'} · Nagad {pay.pay.nagad || 'সেট নেই'}</p>
           <p>{pay.pay.note}</p>
           <p>অর্ডার {pay.order.id} · ৳{pay.order.amount}</p>
           <form
@@ -61,8 +65,8 @@ export default function Billing() {
       <h3>অর্ডার</h3>
       {orders.map((o) => (
         <div key={o.id} className="rowline">
-          <span>{o.plan} · ৳{o.amount} · {o.status} · {o.trx || 'no trx'}</span>
-          {user.role === 'admin' && o.status !== 'paid' && (
+          <span>{o.kind} · {o.pack || o.plan} · ৳{o.amount} · {o.status} · {o.trx || 'trx নেই'}</span>
+          {me.role === 'admin' && o.status !== 'paid' && (
             <button type="button" className="btn ghost" onClick={async () => { await api('/api/billing/confirm', { method: 'POST', body: JSON.stringify({ id: o.id }) }); load() }}>কনফার্ম</button>
           )}
         </div>

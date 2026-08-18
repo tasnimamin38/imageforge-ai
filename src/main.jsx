@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { ClerkProvider } from '@clerk/react'
 import App from './App'
 import './styles.css'
-import './mbp.css'
+import './app.css'
 
 const pk = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 const tree = (
@@ -20,5 +20,5 @@ createRoot(document.getElementById('root')).render(
         {tree}
       </ClerkProvider>
     ) : tree}
-  </React.StrictMode>
+  </React.StrictMode>,
 )

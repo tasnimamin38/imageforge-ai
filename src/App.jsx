@@ -1,16 +1,15 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Marketing from './Marketing'
-import Login from './mbp/Login'
-import Shell from './mbp/Shell'
-import Dashboard from './mbp/Dashboard'
-import Crm from './mbp/Crm'
-import Inventory from './mbp/Inventory'
-import Finance from './mbp/Finance'
-import Hr from './mbp/Hr'
-import Projects from './mbp/Projects'
-import Settings from './mbp/Settings'
-import Studio from './mbp/Studio'
-import Billing from './mbp/Billing'
+import Auth from './pages/Auth'
+import Shell from './pages/Shell'
+import Dashboard from './pages/Dashboard'
+import Studio from './pages/Studio'
+import Catalog from './pages/Catalog'
+import Campaigns from './pages/Campaigns'
+import Clients from './pages/Clients'
+import Billing from './pages/Billing'
+import Settings from './pages/Settings'
+import Library from './pages/Library'
 import OAuth from './OAuth'
 import { token } from './api'
 import { clerkEnabled, ClerkGuard, ClerkSignInPage, ClerkSignUpPage } from './clerkAuth'
@@ -25,7 +24,8 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Marketing />} />
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={<Auth mode="login" />} />
+      <Route path="/signup" element={<Auth mode="signup" />} />
       <Route path="/sign-in/*" element={<ClerkSignInPage />} />
       <Route path="/sign-up/*" element={<ClerkSignUpPage />} />
       <Route path="/oauth" element={<OAuth />} />
@@ -39,12 +39,11 @@ export default function App() {
       >
         <Route index element={<Dashboard />} />
         <Route path="studio" element={<Studio />} />
+        <Route path="catalog" element={<Catalog />} />
+        <Route path="campaigns" element={<Campaigns />} />
+        <Route path="clients" element={<Clients />} />
+        <Route path="library" element={<Library />} />
         <Route path="billing" element={<Billing />} />
-        <Route path="crm" element={<Crm />} />
-        <Route path="inventory" element={<Inventory />} />
-        <Route path="finance" element={<Finance />} />
-        <Route path="hr" element={<Hr />} />
-        <Route path="projects" element={<Projects />} />
         <Route path="settings" element={<Settings />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

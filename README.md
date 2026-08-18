@@ -1,58 +1,43 @@
-# মাইক্রোসাস · MicroSaaS
+# ImageForge AI
 
-**Vercel 404?** Production branch must be `arena/019ff725-imageforge-ai` (or merge this branch into `main`). `main` only had a README, so Vercel served `NOT_FOUND`.
+Digital-only **neuro-marketing SaaS**. Live multi-provider AI (Groq, Cerebras, OpenRouter, NaraRouter, Gemini). No demo logins. No physical inventory.
 
-Settings → Git → Production Branch → this branch → Redeploy. Add env vars from `.env.example`.
-
-
-AI studio + business OS + Google login + bKash/Nagad credits.
-
-## Clerk
-
-App: `app_3HpXHtjwJ74gFTgIx8dk08Xm6QT`
-
-1. Dashboard → API keys → copy **Publishable key** into `VITE_CLERK_PUBLISHABLE_KEY`
-2. Put `CLERK_SECRET_KEY` only on the server / Vercel (never in the browser)
-3. Allowed origins: your Vercel URL and `http://localhost:5173`
-
-Then nav shows **সাইন ইন / সাইন আপ** and a profile button after signup.
+Production domain: `https://imageforge-ai.vercel.app` — merge **PR #2** (or set Vercel Production Branch to `arena/019ff725-imageforge-ai`). `main` was an empty README, which caused `NOT_FOUND`.
 
 ## Local
 
 ```bash
 cp .env.example .env
+# fill keys — never commit .env
 npm install
 npm run dev
 ```
 
-Demo: `admin@microsys.local` / `Microsys@2026`
+Open the Vite URL. Create your own account at `/signup`. The first user becomes admin.
 
-## Vercel (GitHub → Deploy)
+## Vercel env (Project → Settings → Environment Variables)
 
-This sandbox cannot reach `api.vercel.com` (TLS blocked), so deploy from your machine or the Vercel dashboard.
+Add the same names as `.env.example`:
 
-**Easiest:** [vercel.com/new](https://vercel.com/new) → Import `tasnimamin38/imageforge-ai` → branch `arena/019ff725-imageforge-ai`.
+- `JWT_SECRET` — long random string
+- `APP_URL` — `https://imageforge-ai.vercel.app` (and preview URL if you use Google OAuth there)
+- `GROQ_API_KEY` `CEREBRAS_API_KEY` `OPENROUTER_API_KEY` `NARAROUTER_API_KEY` `GEMINI_API_KEY`
+- `PAY_BKASH` `PAY_NAGAD` — your real wallet numbers
+- optional Google: `GOOGLE_CLIENT_ID` `GOOGLE_CLIENT_SECRET`
+- optional Clerk: `VITE_CLERK_PUBLISHABLE_KEY` `CLERK_SECRET_KEY`
 
-**CLI (your PC):**
+Google Cloud → Authorized redirect URIs:
 
-```bash
-npx vercel login
-npx vercel --prod --yes
-```
+- `https://imageforge-ai.vercel.app/api/auth/google/callback`
+- preview host `/api/auth/google/callback`
+- local `http://localhost:8787/api/auth/google/callback`
 
-Or `VERCEL_TOKEN=... npx vercel --prod --yes`
+Redeploy after saving env.
 
-In the Vercel project add env names from `.env.example`. After first deploy set `APP_URL` to the `*.vercel.app` URL.
+## Persistence
 
-Google Cloud OAuth:
-   - Authorized JavaScript origins: `https://YOUR.vercel.app`
-   - Redirect URIs: `https://YOUR.vercel.app/api/auth/google/callback`
-   - Local: `http://localhost:8787` and `http://localhost:5173` + `/api/auth/google/callback`
+JSON store (`server/data.json` locally, `/tmp` on Vercel). Serverless `/tmp` resets on cold start. For paying customers add Neon/Postgres later.
 
-Set `APP_URL` to the Vercel URL so OAuth redirects stay on the live domain.
+## Billing
 
-**Note:** file JSON DB is fine for demo. For real customers use Vercel Postgres / Neon. Serverless `/tmp` resets.
-
-## Income
-
-Growth ৳2990 / Scale ৳12900 — customers pay bKash/Nagad, paste trx, you confirm in Billing (admin).
+Customers pay bKash/Nagad, paste trx, **first registered user (admin)** confirms in Billing. Digital packs unlock instantly after confirm. No warehouse, no SKUs.

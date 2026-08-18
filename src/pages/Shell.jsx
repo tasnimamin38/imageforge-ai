@@ -1,35 +1,25 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { ClerkControls, clerkEnabled, useClerkProfile } from '../clerkAuth'
+import { clearSession, currentUser } from '../api'
 
 const links = [
-  ['', 'কমান্ড'],
+  ['', 'ওভারভিউ'],
   ['studio', 'স্টুডিও'],
+  ['catalog', 'ডিজিটাল শপ'],
+  ['campaigns', 'ক্যাম্পেইন'],
+  ['clients', 'ক্লায়েন্ট'],
+  ['library', 'লাইব্রেরি'],
   ['billing', 'বিলিং'],
-  ['crm', 'CRM'],
-  ['inventory', 'ইনভেন্টরি'],
-  ['finance', 'ফাইন্যান্স'],
-  ['hr', 'HR'],
-  ['projects', 'প্রজেক্ট'],
-  ['settings', 'কন্ট্রোল'],
+  ['settings', 'সেটিংস'],
 ]
 
-function LocalIdentity() {
-  let user = {}
-  try { user = JSON.parse(localStorage.getItem('mbp_user') || '{}') } catch { /* ignore */ }
-  return (
-    <div>
-      <strong>{user.name || 'গেস্ট'}</strong>
-      <span>{user.role} · {user.dept || 'Microsys'}</span>
-    </div>
-  )
-}
-
-function ClerkIdentity() {
-  const user = useClerkProfile() || {}
+function Identity() {
+  const clerk = useClerkProfile()
+  const user = clerk || currentUser()
   return (
     <div>
       <strong>{user.name || 'মেম্বার'}</strong>
-      <span>{user.email || 'Clerk'}</span>
+      <span>{user.role || 'member'} · {user.plan || 'spark'} · {user.email || ''}</span>
     </div>
   )
 }
@@ -38,15 +28,14 @@ export default function Shell() {
   const nav = useNavigate()
 
   function out() {
-    localStorage.removeItem('mbp_token')
-    localStorage.removeItem('mbp_user')
+    clearSession()
     nav('/login')
   }
 
   return (
     <div className="mbp">
       <aside>
-        <div className="brand"><div className="logo" /> MBP</div>
+        <div className="brand"><div className="logo" /> Forge</div>
         {links.map(([to, label]) => (
           <NavLink key={to || 'home'} end={to === ''} to={to ? `/app/${to}` : '/app'}>{label}</NavLink>
         ))}
@@ -54,8 +43,8 @@ export default function Shell() {
       </aside>
       <main>
         <header className="mbp-top">
-          {clerkEnabled ? <ClerkIdentity /> : <LocalIdentity />}
-          <em>TENANT · microsys-prod</em>
+          <Identity />
+          <em>DIGITAL · NEURO</em>
         </header>
         <Outlet />
       </main>
