@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { ClerkControls, clerkEnabled } from './clerkAuth'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Float, MeshDistortMaterial, Sparkles, Stars } from '@react-three/drei'
-import { motion } from 'framer-motion'
+import { motion, animate as motionAnimate, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
 
 function Core() {
   const ref = useRef()
@@ -14,6 +14,7 @@ function Core() {
     ref.current.rotation.x = Math.sin(t * 0.28) * 0.18
   })
   return (
+    <group>
     <Float speed={2} rotationIntensity={0.55} floatIntensity={1.1}>
       <mesh ref={ref} scale={1.55}>
         <icosahedronGeometry args={[1.15, 8]} />
@@ -28,6 +29,23 @@ function Core() {
         <meshBasicMaterial color="#ff4d8d" />
       </mesh>
     </Float>
+    <Float speed={3.4} rotationIntensity={1.4} floatIntensity={1.25}>
+      <mesh position={[2.05, 0.92, 0.15]} scale={0.19}>
+        <octahedronGeometry args={[1, 1]} />
+        <meshStandardMaterial color="#3ee0c8" emissive="#3ee0c8" emissiveIntensity={1.5} metalness={0.7} roughness={0.2} />
+      </mesh>
+    </Float>
+    <Float speed={2.7} rotationIntensity={1.2} floatIntensity={1.1}>
+      <mesh position={[-2.15, -0.82, 0.3]} scale={0.14}>
+        <icosahedronGeometry args={[1, 1]} />
+        <meshStandardMaterial color="#ff4d8d" emissive="#ff4d8d" emissiveIntensity={1.25} metalness={0.7} roughness={0.2} />
+      </mesh>
+    </Float>
+    <mesh rotation={[0.55, 0.3, 0.2]} scale={2.65}>
+      <torusGeometry args={[1.04, 0.008, 10, 140]} />
+      <meshBasicMaterial color="#9b8bff" transparent opacity={0.72} />
+    </mesh>
+    </group>
   )
 }
 
@@ -37,9 +55,10 @@ function Scene() {
       <color attach="background" args={['#05060c']} />
       <ambientLight intensity={0.45} />
       <pointLight position={[4, 4, 4]} intensity={18} color="#8a7dff" />
-      <pointLight position={[-5, -2, -3]} intensity={12} color="#3ee0c8" />
-      <Stars radius={80} depth={40} count={2200} factor={3} fade speed={0.8} />
-      <Sparkles count={80} scale={10} size={3} speed={0.4} color="#c9c4ff" />
+      <pointLight position={[-5, -2, -3]} intensity={15} color="#3ee0c8" />
+      <pointLight position={[0, 2, -4]} intensity={10} color="#ff4d8d" />
+      <Stars radius={82} depth={48} count={2400} factor={3} fade speed={0.7} />
+      <Sparkles count={110} scale={11} size={3.2} speed={0.42} color="#d8d4ff" />
       <Core />
     </>
   )
@@ -60,6 +79,19 @@ function MiniOrb() {
   )
 }
 
+function AnimatedNumber({ value }) {
+  const count = useMotionValue(0)
+  const rounded = useTransform(count, (latest) => Math.round(latest).toLocaleString('en-US'))
+  useEffect(() => {
+    const controls = motionAnimate(count, Number(value) || 0, { duration: 1.2, ease: 'easeOut' })
+    return () => controls.stop()
+  }, [count, value])
+  return <motion.b>{rounded}</motion.b>
+}
+
+const MotionLink = motion(Link)
+const springTap = { type: 'spring', stiffness: 420, damping: 16 }
+
 export default function Marketing() {
   const [stats, setStats] = useState({ members: 0, campaigns: 0, generations: 0, liveProviders: 0 })
   const [services, setServices] = useState([])
@@ -68,6 +100,9 @@ export default function Marketing() {
   const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [note, setNote] = useState('')
   const [open, setOpen] = useState(false)
+  const reduceMotion = useReducedMotion()
+  const { scrollYProgress } = useScroll()
+  const scrollProgress = useSpring(scrollYProgress, { stiffness: 115, damping: 28, restDelta: 0.001 })
 
   useEffect(() => {
     fetch('/api/stats').then((r) => r.json()).then(setStats).catch(() => {})
@@ -96,6 +131,7 @@ export default function Marketing() {
 
   return (
     <>
+      <motion.div className="scroll-progress" style={{ scaleX: scrollProgress }} />
       <nav className="nav">
         <Link className="brand" to="/"><div className="logo" /> ImageForge AI</Link>
         <div className="nav-links">
@@ -104,7 +140,7 @@ export default function Marketing() {
           <a href="#pricing">প্রাইসিং</a>
           <Link to="/login">লগইন</Link>
         </div>
-        {clerkEnabled ? <ClerkControls compact /> : <Link className="nav-cta" to="/signup">ফ্রি শুরু</Link>}
+        {clerkEnabled ? <ClerkControls compact /> : <MotionLink className="nav-cta" to="/signup" whileHover={reduceMotion ? undefined : { scale: 1.045, y: -2 }} whileTap={{ scale: 0.96 }} transition={springTap}>ফ্রি শুরু</MotionLink>}
         <button type="button" className="menu-btn" onClick={() => setOpen((v) => !v)} aria-label="মেনু">☰</button>
       </nav>
       <div className={`drawer ${open ? 'open' : ''}`}>
@@ -128,29 +164,29 @@ export default function Marketing() {
             ImageForge AI — অনলাইন নিউরো-মার্কেটিং স্টুডিও। অ্যাড, হেডলাইন, ফানেল, ট্রিগার ম্যাপ ও ক্রিয়েটিভ প্রম্পট। কোনো ফিজিক্যাল প্রোডাক্ট নেই, কোনো ডেমো অ্যাকাউন্ট নেই।
           </p>
           <div className="hero-actions">
-            <Link className="btn primary" to="/signup">অ্যাকাউন্ট খুলুন</Link>
-            <a className="btn ghost" href="#pricing">প্ল্যান দেখুন</a>
+            <MotionLink className="btn primary" to="/signup" whileHover={reduceMotion ? undefined : { scale: 1.055, y: -4 }} whileTap={{ scale: 0.95 }} transition={springTap}>অ্যাকাউন্ট খুলুন</MotionLink>
+            <motion.a className="btn ghost" href="#pricing" whileHover={reduceMotion ? undefined : { scale: 1.035, y: -3 }} whileTap={{ scale: 0.96 }} transition={springTap}>প্ল্যান দেখুন</motion.a>
           </div>
         </motion.div>
       </header>
 
       <div className="stats">
-        <div className="stat"><b>{stats.liveProviders}</b><span>লাইভ AI প্রোভাইডার</span></div>
-        <div className="stat"><b>{stats.generations}</b><span>জেনারেটেড অ্যাসেট</span></div>
-        <div className="stat"><b>{stats.campaigns}</b><span>ডিজিটাল ক্যাম্পেইন</span></div>
-        <div className="stat"><b>{stats.members}</b><span>রেজিস্টার্ড মেম্বার</span></div>
+        <div className="stat"><AnimatedNumber value={stats.liveProviders} /><span>লাইভ AI প্রোভাইডার</span></div>
+        <div className="stat"><AnimatedNumber value={stats.generations} /><span>জেনারেটেড অ্যাসেট</span></div>
+        <div className="stat"><AnimatedNumber value={stats.campaigns} /><span>ডিজিটাল ক্যাম্পেইন</span></div>
+        <div className="stat"><AnimatedNumber value={stats.members} /><span>রেজিস্টার্ড মেম্বার</span></div>
       </div>
 
       <section id="products">
         <h2 className="section-title">ডিজিটাল নিউরো টুলস</h2>
         <p className="section-sub">প্রতিটি আউটপুট অনলাইনে ডেলিভার হয় — ক্রেডিট খরচ করে স্টুডিওতে জেনারেট করুন।</p>
         <div className="grid">
-          {services.map((s) => (
-            <article className="card" key={s.id}>
+          {services.map((s, i) => (
+            <motion.article className="card bounce-card" key={s.id} initial={{ opacity: 0, y: 26, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} whileHover={reduceMotion ? undefined : { y: -10, scale: 1.025, rotateX: 1.6 }} whileTap={{ scale: 0.985 }} viewport={{ once: true, amount: 0.16 }} transition={{ duration: 0.62, delay: Math.min(i * 0.06, 0.24), ease: 'easeOut' }} style={{ transformPerspective: 900 }}>
               <small>{s.en}</small>
               <h3>{s.title}</h3>
               <p>{s.desc}</p>
-            </article>
+            </motion.article>
           ))}
         </div>
       </section>
@@ -160,12 +196,12 @@ export default function Marketing() {
           <h2 className="section-title">ওয়ান-টাইম ডিজিটাল প্যাক</h2>
           <p className="section-sub">লাইফটাইম আনলক + বোনাস ক্রেডিট। শিপিং নেই, ওয়্যারহাউস নেই — পেমেন্ট কনফার্মের সাথেই লাইব্রেরিতে চলে আসে।</p>
           <div className="grid">
-            {packs.map((p) => (
-              <article className="card" key={p.id}>
+            {packs.map((p, i) => (
+              <motion.article className="card bounce-card" key={p.id} initial={{ opacity: 0, y: 26, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} whileHover={reduceMotion ? undefined : { y: -10, scale: 1.025, rotateX: 1.6 }} whileTap={{ scale: 0.985 }} viewport={{ once: true, amount: 0.16 }} transition={{ duration: 0.62, delay: Math.min(i * 0.06, 0.24), ease: 'easeOut' }} style={{ transformPerspective: 900 }}>
                 <small>৳{p.price} · +{p.bonusCredits} ক্রেডিট</small>
                 <h3>{p.bn}</h3>
                 <p>{p.blurb}</p>
-              </article>
+              </motion.article>
             ))}
           </div>
         </div>
@@ -184,7 +220,7 @@ export default function Marketing() {
               <ul>
                 {(p.features || []).map((f) => <li key={f}>{f}</li>)}
               </ul>
-              <Link className="btn primary" to="/signup">{p.bdt === 0 ? 'ফ্রি সাইন আপ' : 'কিনতে সাইন আপ'}</Link>
+              <MotionLink className="btn primary" to="/signup" whileHover={reduceMotion ? undefined : { scale: 1.04, y: -3 }} whileTap={{ scale: 0.96 }} transition={springTap}>{p.bdt === 0 ? 'ফ্রি সাইন আপ' : 'কিনতে সাইন আপ'}</MotionLink>
             </article>
           ))}
         </div>
@@ -196,7 +232,7 @@ export default function Marketing() {
           <input placeholder="নাম / ব্র্যান্ড" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           <input type="email" placeholder="ইমেইল" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
           <textarea placeholder="কী ডিজিটাল ক্যাম্পেইন চালাবেন?" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} required />
-          <button className="btn primary" type="submit">মেসেজ পাঠান</button>
+          <motion.button className="btn primary" type="submit" whileHover={reduceMotion ? undefined : { scale: 1.025, y: -2 }} whileTap={{ scale: 0.97 }} transition={springTap}>মেসেজ পাঠান</motion.button>
           <p className="form-note">{note}</p>
         </form>
       </section>
