@@ -168,6 +168,15 @@ export default function Marketing() {
             <motion.a className="btn ghost" href="#pricing" whileHover={reduceMotion ? undefined : { scale: 1.035, y: -3 }} whileTap={{ scale: 0.96 }} transition={springTap}>প্যাকেজ দেখুন</motion.a>
           </div>
         </motion.div>
+        <motion.div className="hero-preview" initial={{ opacity: 0, x: 55, rotateY: -12 }} animate={{ opacity: 1, x: 0, rotateY: 0 }} transition={{ duration: 1, delay: 0.2 }}>
+          <div className="preview-window">
+            <div className="preview-top"><span className="preview-dots"><i /><i /><i /></span><span>IMAGEFORGE AI · সৃজনশীল কর্মশালা</span><span>● সক্রিয়</span></div>
+            <h3 className="preview-heading">ভাবনাকে রূপ দিন।<br/><span>ব্র্যান্ডকে এগিয়ে নিন।</span></h3>
+            <p className="preview-sub">একটি নির্দেশনা থেকেই বিজ্ঞাপন, শিরোনাম ও প্রচারণার কনটেন্ট তৈরি করুন।</p>
+            <div className="preview-pills"><span>AI কপি</span><span>ব্র্যান্ড কিট</span><span>প্রচারণা</span></div>
+            <div className="preview-board"><div className="preview-tile">কনটেন্ট পরিকল্পনা<b>স্মার্ট প্রচারণা</b></div><div className="preview-tile">সৃজনশীল নির্দেশনা<b>ভিজ্যুয়াল ফোর্জ</b></div><div className="preview-tile">আবেগের মানচিত্র<b>অডিয়েন্স ইনসাইট</b></div><div className="preview-tile">ফলাফল বিশ্লেষণ<b>পারফরম্যান্স</b></div><div className="preview-orb" /></div>
+          </div>
+        </motion.div>
       </header>
 
       <div className="stats">
