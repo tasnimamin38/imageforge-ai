@@ -10,8 +10,8 @@ export default function Clients() {
 
   return (
     <div className="pad">
-      <h2>ডিজিটাল ক্লায়েন্ট</h2>
-      <p className="muted">এজেন্সি ওয়ার্কস্পেস — শুধু অনলাইন ব্র্যান্ড/অফার, ইনভেন্টরি নয়।</p>
+      <h2>ডিজিটাল গ্রাহক</h2>
+      <p className="muted">এজেন্সির কর্মক্ষেত্র — এখানে অনলাইন ব্র্যান্ড ও অফার পরিচালনা করুন।</p>
       <form
         className="stack"
         onSubmit={async (e) => {
@@ -23,7 +23,7 @@ export default function Clients() {
       >
         <div className="row">
           <input placeholder="ব্র্যান্ড" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-          <input placeholder="নিশ" value={form.niche} onChange={(e) => setForm({ ...form, niche: e.target.value })} />
+          <input placeholder="ব্যবসার ধরন" value={form.niche} onChange={(e) => setForm({ ...form, niche: e.target.value })} />
         </div>
         <input placeholder="ডিজিটাল অফার" value={form.offer} onChange={(e) => setForm({ ...form, offer: e.target.value })} />
         <button className="btn primary" type="submit">যোগ করুন</button>
