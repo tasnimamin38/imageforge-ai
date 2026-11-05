@@ -135,19 +135,19 @@ export default function Marketing() {
       <nav className="nav">
         <Link className="brand" to="/"><div className="logo" /> ImageForge AI</Link>
         <div className="nav-links">
-          <a href="#products">টুলস</a>
-          <a href="#packs">ডিজিটাল প্যাক</a>
-          <a href="#pricing">প্রাইসিং</a>
-          <Link to="/login">লগইন</Link>
+          <a href="#products">টুলসমূহ</a>
+          <a href="#packs">ডিজিটাল প্যাকেজ</a>
+          <a href="#pricing">মূল্যতালিকা</a>
+          <Link to="/login">প্রবেশ করুন</Link>
         </div>
-        {clerkEnabled ? <ClerkControls compact /> : <MotionLink className="nav-cta" to="/signup" whileHover={reduceMotion ? undefined : { scale: 1.045, y: -2 }} whileTap={{ scale: 0.96 }} transition={springTap}>ফ্রি শুরু</MotionLink>}
+        {clerkEnabled ? <ClerkControls compact /> : <MotionLink className="nav-cta" to="/signup" whileHover={reduceMotion ? undefined : { scale: 1.045, y: -2 }} whileTap={{ scale: 0.96 }} transition={springTap}>বিনামূল্যে শুরু করুন</MotionLink>}
         <button type="button" className="menu-btn" onClick={() => setOpen((v) => !v)} aria-label="মেনু">☰</button>
       </nav>
       <div className={`drawer ${open ? 'open' : ''}`}>
-        <a href="#products" onClick={() => setOpen(false)}>টুলস</a>
-        <a href="#packs" onClick={() => setOpen(false)}>ডিজিটাল প্যাক</a>
-        <a href="#pricing" onClick={() => setOpen(false)}>প্রাইসিং</a>
-        <Link to="/login" onClick={() => setOpen(false)}>লগইন</Link>
+        <a href="#products" onClick={() => setOpen(false)}>টুলসমূহ</a>
+        <a href="#packs" onClick={() => setOpen(false)}>ডিজিটাল প্যাকেজ</a>
+        <a href="#pricing" onClick={() => setOpen(false)}>মূল্যতালিকা</a>
+        <Link to="/login" onClick={() => setOpen(false)}>প্রবেশ করুন</Link>
         <Link to="/signup" onClick={() => setOpen(false)}>সাইন আপ</Link>
       </div>
 
@@ -158,28 +158,28 @@ export default function Marketing() {
           </Canvas>
         </div>
         <motion.div className="hero-copy" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="kicker live-dot"><i /> Neuro-marketing · ১০০% ডিজিটাল</p>
+          <p className="kicker live-dot"><i /> নিউরো-মার্কেটিং · সম্পূর্ণ ডিজিটাল</p>
           <h1>মস্তিষ্ক পড়ে<span>কপি ফোর্জ করে</span></h1>
           <p className="lede">
-            ImageForge AI — অনলাইন নিউরো-মার্কেটিং স্টুডিও। অ্যাড, হেডলাইন, ফানেল, ট্রিগার ম্যাপ ও ক্রিয়েটিভ প্রম্পট। কোনো ফিজিক্যাল প্রোডাক্ট নেই, কোনো ডেমো অ্যাকাউন্ট নেই।
+            ImageForge AI — অনলাইন নিউরো-মার্কেটিং স্টুডিও। অ্যাড, হেডলাইন, ফানেল, ট্রিগার ম্যাপ ও ক্রিয়েটিভ প্রম্পট। এখানে সবকিছুই ডিজিটাল — কোনো ভৌত পণ্য বা ভুয়া ডেমো অ্যাকাউন্ট নেই।
           </p>
           <div className="hero-actions">
-            <MotionLink className="btn primary" to="/signup" whileHover={reduceMotion ? undefined : { scale: 1.055, y: -4 }} whileTap={{ scale: 0.95 }} transition={springTap}>অ্যাকাউন্ট খুলুন</MotionLink>
-            <motion.a className="btn ghost" href="#pricing" whileHover={reduceMotion ? undefined : { scale: 1.035, y: -3 }} whileTap={{ scale: 0.96 }} transition={springTap}>প্ল্যান দেখুন</motion.a>
+            <MotionLink className="btn primary" to="/signup" whileHover={reduceMotion ? undefined : { scale: 1.055, y: -4 }} whileTap={{ scale: 0.95 }} transition={springTap}>অ্যাকাউন্ট তৈরি করুন</MotionLink>
+            <motion.a className="btn ghost" href="#pricing" whileHover={reduceMotion ? undefined : { scale: 1.035, y: -3 }} whileTap={{ scale: 0.96 }} transition={springTap}>প্যাকেজ দেখুন</motion.a>
           </div>
         </motion.div>
       </header>
 
       <div className="stats">
-        <div className="stat"><AnimatedNumber value={stats.liveProviders} /><span>লাইভ AI প্রোভাইডার</span></div>
-        <div className="stat"><AnimatedNumber value={stats.generations} /><span>জেনারেটেড অ্যাসেট</span></div>
+        <div className="stat"><AnimatedNumber value={stats.liveProviders} /><span>সক্রিয় AI সেবা</span></div>
+        <div className="stat"><AnimatedNumber value={stats.generations} /><span>তৈরি কনটেন্ট</span></div>
         <div className="stat"><AnimatedNumber value={stats.campaigns} /><span>ডিজিটাল ক্যাম্পেইন</span></div>
-        <div className="stat"><AnimatedNumber value={stats.members} /><span>রেজিস্টার্ড মেম্বার</span></div>
+        <div className="stat"><AnimatedNumber value={stats.members} /><span>নিবন্ধিত সদস্য</span></div>
       </div>
 
       <section id="products">
-        <h2 className="section-title">ডিজিটাল নিউরো টুলস</h2>
-        <p className="section-sub">প্রতিটি আউটপুট অনলাইনে ডেলিভার হয় — ক্রেডিট খরচ করে স্টুডিওতে জেনারেট করুন।</p>
+        <h2 className="section-title">ডিজিটাল নিউরো টুলসমূহ</h2>
+        <p className="section-sub">প্রতিটি ফলাফল অনলাইনেই পাবেন — ক্রেডিট ব্যবহার করে স্টুডিওতে কনটেন্ট তৈরি করুন।</p>
         <div className="grid">
           {services.map((s, i) => (
             <motion.article className="card bounce-card" key={s.id} initial={{ opacity: 0, y: 26, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} whileHover={reduceMotion ? undefined : { y: -10, scale: 1.025, rotateX: 1.6 }} whileTap={{ scale: 0.985 }} viewport={{ once: true, amount: 0.16 }} transition={{ duration: 0.62, delay: Math.min(i * 0.06, 0.24), ease: 'easeOut' }} style={{ transformPerspective: 900 }}>
@@ -193,8 +193,8 @@ export default function Marketing() {
 
       <section id="packs" className="about">
         <div>
-          <h2 className="section-title">ওয়ান-টাইম ডিজিটাল প্যাক</h2>
-          <p className="section-sub">লাইফটাইম আনলক + বোনাস ক্রেডিট। শিপিং নেই, ওয়্যারহাউস নেই — পেমেন্ট কনফার্মের সাথেই লাইব্রেরিতে চলে আসে।</p>
+          <h2 className="section-title">এককালীন ডিজিটাল প্যাকেজেজ</h2>
+          <p className="section-sub">একবার কিনলেই স্থায়ী অ্যাক্সেস ও বোনাস ক্রেডিট। পেমেন্ট নিশ্চিত হলেই আপনার সংগ্রহশালায় যুক্ত হবে।</p>
           <div className="grid">
             {packs.map((p, i) => (
               <motion.article className="card bounce-card" key={p.id} initial={{ opacity: 0, y: 26, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} whileHover={reduceMotion ? undefined : { y: -10, scale: 1.025, rotateX: 1.6 }} whileTap={{ scale: 0.985 }} viewport={{ once: true, amount: 0.16 }} transition={{ duration: 0.62, delay: Math.min(i * 0.06, 0.24), ease: 'easeOut' }} style={{ transformPerspective: 900 }}>
@@ -210,7 +210,7 @@ export default function Marketing() {
 
       <section id="pricing">
         <h2 className="section-title">ক্রেডিট প্ল্যান</h2>
-        <p className="section-sub">Spark ফ্রি। Pulse ও Synapse bKash/Nagad — আপনার নিজের অ্যাকাউন্ট দিয়ে কিনুন।</p>
+        <p className="section-sub">Spark বিনামূল্যে। Pulse ও Synapse প্যাকেজ বিকাশ বা নগদের মাধ্যমে কিনুন।</p>
         <div className="grid price-grid">
           {plans.map((p) => (
             <article className={`card price ${p.bdt > 0 && p.id === 'pulse' ? 'hot' : ''}`} key={p.id}>
@@ -227,18 +227,18 @@ export default function Marketing() {
       </section>
 
       <section id="contact">
-        <h2 className="section-title">এজেন্সি / পার্টনারশিপ</h2>
+        <h2 className="section-title">এজেন্সি ও অংশীদারত্ব</h2>
         <form onSubmit={submit}>
           <input placeholder="নাম / ব্র্যান্ড" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           <input type="email" placeholder="ইমেইল" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-          <textarea placeholder="কী ডিজিটাল ক্যাম্পেইন চালাবেন?" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} required />
-          <motion.button className="btn primary" type="submit" whileHover={reduceMotion ? undefined : { scale: 1.025, y: -2 }} whileTap={{ scale: 0.97 }} transition={springTap}>মেসেজ পাঠান</motion.button>
+          <textarea placeholder="কী ধরনের ডিজিটাল প্রচারাভিযান চালাতে চান?" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} required />
+          <motion.button className="btn primary" type="submit" whileHover={reduceMotion ? undefined : { scale: 1.025, y: -2 }} whileTap={{ scale: 0.97 }} transition={springTap}>বার্তা পাঠান</motion.button>
           <p className="form-note">{note}</p>
         </form>
       </section>
       <footer>
-        <span>© {new Date().getFullYear()} ImageForge AI · Digital neuro-marketing</span>
-        <span>Dhaka · No physical SKUs</span>
+        <span>© {new Date().getFullYear()} ImageForge AI · ডিজিটাল নিউরো-মার্কেটিং</span>
+        <span>ঢাকা · সম্পূর্ণ ডিজিটাল সেবা</span>
       </footer>
     </>
   )
