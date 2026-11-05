@@ -9,9 +9,9 @@ export default function Library() {
 
   return (
     <div className="pad">
-      <h2>ডিজিটাল লাইব্রেরি</h2>
-      <p className="muted">আপনার জেনারেটেড অ্যাসেট — ইনস্ট্যান্ট ডেলিভারি, কোনো শিপিং নেই।</p>
-      {items.length === 0 && <p className="muted">এখনো খালি। স্টুডিও থেকে তৈরি করুন।</p>}
+      <h2>ডিজিটাল সংগ্রহশালা</h2>
+      <p className="muted">আপনার আপনার তৈরি সব কনটেন্ট এক জায়গায় — সঙ্গে সঙ্গে ব্যবহার করুন।</p>
+      {items.length === 0 && <p className="muted">এখনো কিছু সংরক্ষিত নেই। স্টুডিও থেকে প্রথম কনটেন্ট তৈরি করুন।</p>}
       {items.map((it) => (
         <article className="panel" key={it.id} style={{ marginBottom: 12 }}>
           <h3>{it.title}</h3>
