@@ -25,7 +25,7 @@ export default function Studio() {
   async function run(e) {
     e.preventDefault()
     setBusy(true)
-    setOut('লাইভ মডেল কল হচ্ছে…')
+    setOut('AI মডেলের সঙ্গে সংযোগ করা হচ্ছে…')
     try {
       const r = await api('/api/ai/generate', { method: 'POST', body: JSON.stringify({ prompt: q, provider, tool }) })
       setOut(r.text)
@@ -45,7 +45,7 @@ export default function Studio() {
   return (
     <div className="pad">
       <h2>নিউরো স্টুডিও</h2>
-      <p className="muted">ক্রেডিট: {credits} · {active ? `${active.bn} · ${active.credits} ক্রেডিট` : ''} · ডেমো ফলব্যাক নেই</p>
+      <p className="muted">ক্রেডিট: {credits} · {active ? `${active.bn} · ${active.credits} ক্রেডিট` : ''} · ডেমো ফলাফল দেখানো হয় না</p>
       <div className="tool-grid">
         {tools.map((t) => (
           <button type="button" key={t.id} className={`tool ${tool === t.id ? 'on' : ''}`} onClick={() => setTool(t.id)}>
@@ -57,16 +57,16 @@ export default function Studio() {
       <form className="stack" onSubmit={run}>
         <div className="row">
           <select value={provider} onChange={(e) => setProvider(e.target.value)}>
-            <option value="auto">auto (live failover)</option>
+            <option value="auto">স্বয়ংক্রিয় (বিকল্প AI সেবা)</option>
             {['groq', 'cerebras', 'openrouter', 'nararouter', 'gemini'].map((p) => (
-              <option key={p} value={p}>{p}{ready[p] ? '' : ' — no key'}</option>
+              <option key={p} value={p}>{p}{ready[p] ? '' : ' — API কী নেই'}</option>
             ))}
           </select>
-          <button className="btn primary" type="submit" disabled={busy}>{busy ? 'ফোর্জ হচ্ছে…' : 'জেনারেট'}</button>
+          <button className="btn primary" type="submit" disabled={busy}>{busy ? 'তৈরি হচ্ছে…' : 'তৈরি করুন'}</button>
         </div>
         <textarea value={q} onChange={(e) => setQ(e.target.value)} rows={5} />
       </form>
-      {used && <p className="muted">সোর্স: {used}</p>}
+      {used && <p className="muted">AI সেবা: {used}</p>}
       <pre className="ai panel">{out}</pre>
       {chats.map((c) => (
         <div key={c.id || c.prompt} className="panel" style={{ marginTop: 10 }}>
