@@ -65,7 +65,7 @@ export default function Billing() {
       <h3>অর্ডার</h3>
       {orders.map((o) => (
         <div key={o.id} className="rowline">
-          <span>{o.kind} · {o.pack || o.plan} · ৳{o.amount} · {o.status} · {o.trx || 'ট্রানজেকশন আইডি নেই'}</span>
+          <span>{o.kind} · {o.pack || o.plan} · ৳{o.amount} · {{pending: 'অপেক্ষমাণ', paid: 'পরিশোধিত', failed: 'ব্যর্থ', cancelled: 'বাতিল'}[o.status] || o.status} · {o.trx || 'ট্রানজেকশন আইডি নেই'}</span>
           {me.role === 'admin' && o.status !== 'paid' && (
             <button type="button" className="btn ghost" onClick={async () => { await api('/api/billing/confirm', { method: 'POST', body: JSON.stringify({ id: o.id }) }); load() }}>নিশ্চিত করুন</button>
           )}
