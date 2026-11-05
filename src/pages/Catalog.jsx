@@ -22,8 +22,8 @@ export default function Catalog() {
 
   return (
     <div className="pad">
-      <h2>ডিজিটাল প্রোডাক্ট</h2>
-      <p className="muted">টুলগুলো স্টুডিওতে ক্রেডিটে চলে। প্যাকগুলো ওয়ান-টাইম অনলাইন আনলক।</p>
+      <h2>ডিজিটাল পণ্য</h2>
+      <p className="muted">টুলগুলো স্টুডিওতে ক্রেডিটে চলে। প্যাকগুলো এককালীন ডিজিটাল অ্যাক্সেস।</p>
       <div className="kpi-grid">
         {items.map((p) => (
           <article key={p.id}>
@@ -40,9 +40,9 @@ export default function Catalog() {
       </div>
       {pay && (
         <section className="panel">
-          <h3>চেকআউট {pay.order.id}</h3>
+          <h3>পেমেন্ট {pay.order.id}</h3>
           <p>৳{pay.order.amount} · {pay.order.pack || pay.order.plan}</p>
-          <p>bKash {pay.pay.bkash || '—'} · Nagad {pay.pay.nagad || '—'}</p>
+          <p>বিকাশ {pay.pay.bkash || '—'} · নগদ {pay.pay.nagad || '—'}</p>
           <p className="muted">{pay.pay.note}</p>
         </section>
       )}

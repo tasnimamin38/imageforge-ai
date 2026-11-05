@@ -24,7 +24,7 @@ export default function Settings() {
           const u = await api('/api/me', { method: 'PATCH', body: JSON.stringify(body) })
           localStorage.setItem('if_user', JSON.stringify(u))
           setPassword('')
-          setNote('সেভ হয়েছে')
+          setNote('পরিবর্তন সংরক্ষিত হয়েছে')
         }}
       >
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="নাম" />
@@ -34,9 +34,9 @@ export default function Settings() {
       </form>
       {admin && (
         <>
-          <h3 style={{ marginTop: 28 }}>অ্যাডমিন · ইউজার</h3>
+          <h3 style={{ marginTop: 28 }}>অ্যাডমিন · ব্যবহারকারী</h3>
           <table>
-            <thead><tr><th>নাম</th><th>ইমেইল</th><th>রোল</th><th>প্ল্যান</th><th>ক্রেডিট</th></tr></thead>
+            <thead><tr><th>নাম</th><th>ইমেইল</th><th>ভূমিকা</th><th>প্ল্যান</th><th>ক্রেডিট</th></tr></thead>
             <tbody>
               {admin.users.map((u) => (
                 <tr key={u.id}><td>{u.name}</td><td>{u.email}</td><td>{u.role}</td><td>{u.plan}</td><td>{u.credits}</td></tr>

@@ -95,3 +95,14 @@ em.on-track { color: #3ee0c8; }
 @keyframes ifAppCardIn { from { opacity:0;transform:translateY(16px) scale(.985); } to { opacity:1;transform:translateY(0) scale(1); } }
 @keyframes ifBarRise { from { transform:scaleY(.05);opacity:.25; } to { transform:scaleY(1);opacity:1; } }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important; } }
+
+
+/* Motion and glass surfaces across every authenticated screen. */
+.mbp aside .brand{padding:10px 12px 22px}.mbp-top{box-shadow:0 12px 35px rgba(0,0,0,.12)}
+.kpi-grid article{transition:transform .3s cubic-bezier(.2,.8,.2,1),border-color .3s,box-shadow .3s}
+.kpi-grid article:hover{transform:translateY(-6px) scale(1.015);border-color:rgba(62,224,200,.42);box-shadow:0 22px 55px rgba(0,0,0,.28),0 0 28px rgba(62,224,200,.08)}
+.panel{transition:transform .3s,border-color .3s,box-shadow .3s}.panel:hover{transform:translateY(-3px);border-color:rgba(124,92,255,.35);box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.tool{transition:transform .28s cubic-bezier(.2,.8,.2,1),border-color .25s,background .25s}.tool:hover{transform:translateY(-4px) scale(1.015)}
+.bars div{transform-origin:bottom;animation:ifBarRise .85s cubic-bezier(.2,.8,.2,1) both}.bars div:nth-child(2n){animation-delay:.08s}.bars div:nth-child(3n){animation-delay:.16s}
+@keyframes ifBarRise{from{transform:scaleY(.05);opacity:.2}to{transform:scaleY(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.kpi-grid article,.panel,.tool,.bars div{animation:none!important;transition:none!important}}
