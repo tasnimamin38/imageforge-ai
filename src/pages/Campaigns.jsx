@@ -34,7 +34,7 @@ export default function Campaigns() {
       {rows.map((r) => (
         <div key={r.id} className="rowline">
           <span>{r.name} · {r.goal}</span>
-          <em>{r.channel} · {r.status}</em>
+          <em>{r.channel} · {{active: 'সক্রিয়', paused: 'স্থগিত', draft: 'খসড়া', completed: 'সম্পন্ন'}[r.status] || r.status}</em>
         </div>
       ))}
       {rows.length === 0 && <p className="muted">এখনো কোনো প্রচারাভিযান নেই — প্রথমটি তৈরি করুন।</p>}
