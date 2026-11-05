@@ -182,7 +182,7 @@ export default function Marketing() {
       <div className="stats">
         <div className="stat"><AnimatedNumber value={stats.liveProviders} /><span>সক্রিয় AI সেবা</span></div>
         <div className="stat"><AnimatedNumber value={stats.generations} /><span>তৈরি কনটেন্ট</span></div>
-        <div className="stat"><AnimatedNumber value={stats.campaigns} /><span>ডিজিটাল ক্যাম্পেইন</span></div>
+        <div className="stat"><AnimatedNumber value={stats.campaigns} /><span>ডিজিটাল প্রচারাভিযান</span></div>
         <div className="stat"><AnimatedNumber value={stats.members} /><span>নিবন্ধিত সদস্য</span></div>
       </div>
 
@@ -192,7 +192,7 @@ export default function Marketing() {
         <div className="grid">
           {services.map((s, i) => (
             <motion.article className="card bounce-card" key={s.id} initial={{ opacity: 0, y: 26, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} whileHover={reduceMotion ? undefined : { y: -10, scale: 1.025, rotateX: 1.6 }} whileTap={{ scale: 0.985 }} viewport={{ once: true, amount: 0.16 }} transition={{ duration: 0.62, delay: Math.min(i * 0.06, 0.24), ease: 'easeOut' }} style={{ transformPerspective: 900 }}>
-              <small>{s.en}</small>
+              <small>{s.channel}</small>
               <h3>{s.title}</h3>
               <p>{s.desc}</p>
             </motion.article>
