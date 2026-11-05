@@ -53,11 +53,11 @@ export default function Auth({ mode = 'login' }) {
         <input type="password" placeholder={signup ? 'পাসওয়ার্ড (৮+ অক্ষর)' : 'পাসওয়ার্ড'} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={signup ? 'new-password' : 'current-password'} required />
         <button className="btn primary" type="submit" disabled={busy}>{busy ? 'অপেক্ষা…' : signup ? 'সাইন আপ' : 'প্রবেশ'}</button>
         {googleOn && (
-          <a className="btn ghost" href="/api/auth/google">Google দিয়ে চালিয়ে যান</a>
+          <a className="btn ghost" href="/api/auth/google">গুগল অ্যাকাউন্ট দিয়ে চালিয়ে যান</a>
         )}
         {err && <p className="form-note">{err}</p>}
         <p className="hint">
-          {signup ? <Link to="/login">আগে থেকে অ্যাকাউন্ট? লগইন</Link> : <Link to="/signup">নতুন? সাইন আপ</Link>}
+          {signup ? <Link to="/login">আগে থেকেই অ্যাকাউন্ট আছে? প্রবেশ করুন</Link> : <Link to="/signup">নতুন ব্যবহারকারী? অ্যাকাউন্ট খুলুন</Link>}
           {' · '}
           <Link to="/">হোম</Link>
         </p>
