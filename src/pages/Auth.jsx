@@ -15,6 +15,7 @@ export default function Auth({ mode = 'login' }) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [adminBootstrapToken, setAdminBootstrapToken] = useState('')
   const [err, setErr] = useState(ERR[params.get('err')] || '')
   const [busy, setBusy] = useState(false)
   const [googleOn, setGoogleOn] = useState(false)
@@ -30,7 +31,15 @@ export default function Auth({ mode = 'login' }) {
     setBusy(true)
     try {
       const path = signup ? '/api/auth/register' : '/api/auth/login'
-      const data = await api(path, { method: 'POST', body: JSON.stringify({ name, email, password }) })
+      const headers = signup && adminBootstrapToken
+        ? { 'X-Admin-Bootstrap-Token': adminBootstrapToken }
+        : {}
+      const data = await api(path, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ name, email, password }),
+      })
+      setAdminBootstrapToken('')
       saveSession(data.token, data.user)
       nav('/app')
     } catch (e2) {
@@ -45,12 +54,21 @@ export default function Auth({ mode = 'login' }) {
       <form className="login-card" onSubmit={submit}>
         <Link className="brand" to="/"><div className="logo" /> ImageForge AI</Link>
         <h2>{signup ? 'অ্যাকাউন্ট খুলুন' : 'লগইন'}</h2>
-        <p>{signup ? 'প্রথম ইউজার অ্যাডমিন হবেন। কোনো ডেমো পাসওয়ার্ড নেই।' : 'আপনার নিজের ইমেইল ও পাসওয়ার্ড দিন।'}</p>
+        <p>{signup ? 'সাধারণ signup member অ্যাকাউন্ট তৈরি করে। Admin setup-এর জন্য কনফিগার করা email ও bootstrap token ব্যবহার করুন।' : 'আপনার নিজের ইমেইল ও পাসওয়ার্ড দিন।'}</p>
         {signup && (
           <input placeholder="পুরো নাম" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" required />
         )}
         <input type="email" placeholder="ইমেইল" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" required />
         <input type="password" placeholder={signup ? 'পাসওয়ার্ড (৮+ অক্ষর)' : 'পাসওয়ার্ড'} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={signup ? 'new-password' : 'current-password'} required />
+        {signup && (
+          <input
+            type="password"
+            placeholder="Initial admin bootstrap token (অ্যাডমিনের জন্য)"
+            value={adminBootstrapToken}
+            onChange={(e) => setAdminBootstrapToken(e.target.value)}
+            autoComplete="off"
+          />
+        )}
         <button className="btn primary" type="submit" disabled={busy}>{busy ? 'অপেক্ষা…' : signup ? 'সাইন আপ' : 'প্রবেশ'}</button>
         {googleOn && (
           <a className="btn ghost" href="/api/auth/google">গুগল অ্যাকাউন্ট দিয়ে চালিয়ে যান</a>

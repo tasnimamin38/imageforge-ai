@@ -9,12 +9,22 @@ import { load, save, audit, id } from './store.js'
 import { complete, providersStatus, liveProviderCount } from './ai.js'
 import { PLANS } from './plans.js'
 import { PRODUCTS, productById, TOOL_SYSTEM } from './catalog.js'
+import { fulfillPendingOrder } from './billing.js'
+import {
+  buildAllowedOrigins,
+  createOAuthState,
+  isAdminBootstrapAuthorized,
+  isOriginAllowed,
+  resolveJwtSecret,
+  verifyOAuthState,
+} from './security.js'
 
 loadEnv()
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
-const JWT = process.env.JWT_SECRET || 'imageforge-change-this-in-production'
+const JWT = resolveJwtSecret()
+const ALLOWED_ORIGINS = buildAllowedOrigins()
 const GOOGLE_ID = (process.env.GOOGLE_CLIENT_ID || '').trim()
 const GOOGLE_SECRET = (process.env.GOOGLE_CLIENT_SECRET || '').trim()
 const PAY = {
@@ -22,17 +32,41 @@ const PAY = {
   nagad: (process.env.PAY_NAGAD || '').trim(),
 }
 
-app.use(cors({ origin: true, credentials: true }))
+app.disable('x-powered-by')
+app.use(cors({
+  origin(origin, callback) {
+    callback(null, isOriginAllowed(origin, ALLOWED_ORIGINS))
+  },
+  methods: ['GET', 'HEAD', 'POST', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Admin-Bootstrap-Token'],
+}))
 app.use(express.json({ limit: '1mb' }))
 
 let db = load()
 
 function publicOrigin(req) {
-  if (process.env.APP_URL) return process.env.APP_URL.replace(/\/$/, '')
+  if (process.env.APP_URL) return new URL(process.env.APP_URL).origin
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('APP_URL must be configured in production for OAuth redirects.')
+  }
   const host = req.get('host') || ''
   if (host.includes('vercel.app')) return `https://${host}`
   const proto = req.headers['x-forwarded-proto'] || req.protocol || 'http'
   return `${proto}://${host}`
+}
+
+
+}
+
+function readCookie(req, name) {
+  const prefix = `${name}=`
+  const entry = String(req.headers.cookie || '').split(';').map((part) => part.trim()).find((part) => part.startsWith(prefix))
+  if (!entry) return ''
+  try {
+    return decodeURIComponent(entry.slice(prefix.length))
+  } catch {
+    return ''
+  }
 }
 
 function signUser(user) {
@@ -44,7 +78,10 @@ function auth(req, res, next) {
   const token = h.startsWith('Bearer ') ? h.slice(7) : null
   if (!token) return res.status(401).json({ error: 'Unauthorized' })
   try {
-    req.user = jwt.verify(token, JWT)
+    const claims = jwt.verify(token, JWT)
+    const user = db.users.find((item) => item.id === claims.id)
+    if (!user) return res.status(401).json({ error: 'User session is no longer valid' })
+    req.user = { id: user.id, email: user.email, role: user.role, name: user.name }
     next()
   } catch {
     res.status(401).json({ error: 'Invalid token' })
@@ -65,8 +102,7 @@ function emailOk(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim())
 }
 
-function createUser({ name, email, password, provider }) {
-  const role = db.users.length === 0 ? 'admin' : 'member'
+function createUser({ name, email, password, provider, role = 'member' }) {
   const user = {
     id: id('u'),
     name: String(name || email.split('@')[0]).trim().slice(0, 80),
@@ -126,7 +162,20 @@ app.post('/api/auth/register', (req, res) => {
   if (db.users.some((u) => u.email === String(email).toLowerCase().trim())) {
     return res.status(409).json({ error: 'এই ইমেইলে অ্যাকাউন্ট আছে — লগইন করুন' })
   }
-  const user = createUser({ name, email, password, provider: 'password' })
+  const bootstrapAdmin = !db.users.some((user) => user.role === 'admin') &&
+    isAdminBootstrapAuthorized({
+      email,
+      token: req.get('x-admin-bootstrap-token'),
+      adminEmail: process.env.INITIAL_ADMIN_EMAIL,
+      bootstrapToken: process.env.INITIAL_ADMIN_BOOTSTRAP_TOKEN,
+    })
+  const user = createUser({
+    name,
+    email,
+    password,
+    provider: 'password',
+    role: bootstrapAdmin ? 'admin' : 'member',
+  })
   res.json({ token: signUser(user), user: publicUser(user) })
 })
 
@@ -147,11 +196,18 @@ app.get('/api/auth/google', (req, res) => {
     return res.redirect(302, `${origin}/login?err=google-off`)
   }
   const redirectUri = `${origin}/api/auth/google/callback`
+  const oauthState = createOAuthState(JWT)
+  const secureCookie = process.env.NODE_ENV === 'production' ? '; Secure' : ''
+  res.setHeader(
+    'Set-Cookie',
+    `if_oauth_state=${encodeURIComponent(oauthState.cookieValue)}; HttpOnly; SameSite=Lax; Path=/api/auth/google/callback; Max-Age=300${secureCookie}`,
+  )
   const params = new URLSearchParams({
     client_id: GOOGLE_ID,
     redirect_uri: redirectUri,
     response_type: 'code',
     scope: 'openid email profile',
+    state: oauthState.state,
     access_type: 'online',
     prompt: 'select_account',
   })
@@ -160,7 +216,18 @@ app.get('/api/auth/google', (req, res) => {
 
 app.get('/api/auth/google/callback', async (req, res) => {
   const origin = publicOrigin(req)
+  const oauthStateCookie = readCookie(req, 'if_oauth_state')
+  const secureCookie = process.env.NODE_ENV === 'production' ? '; Secure' : ''
+  res.setHeader(
+    'Set-Cookie',
+    `if_oauth_state=; HttpOnly; SameSite=Lax; Path=/api/auth/google/callback; Max-Age=0${secureCookie}`,
+  )
   try {
+    if (!verifyOAuthState({
+      state: String(req.query.state || ''),
+      cookieValue: oauthStateCookie,
+      secret: JWT,
+    })) throw new Error('invalid-oauth-state')
     if (!GOOGLE_ID || !GOOGLE_SECRET) throw new Error('google-off')
     const code = req.query.code
     if (!code) throw new Error('no-code')
@@ -177,12 +244,14 @@ app.get('/api/auth/google/callback', async (req, res) => {
       }),
     })
     const tokens = await tokenRes.json()
-    if (!tokens.access_token) throw new Error(tokens.error || 'token')
+    if (!tokenRes.ok || !tokens.access_token) throw new Error(tokens.error || 'token')
     const profileRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
       headers: { Authorization: `Bearer ${tokens.access_token}` },
     })
     const profile = await profileRes.json()
-    if (!profile.email) throw new Error('no-email')
+    if (!profileRes.ok || !profile.email || profile.verified_email !== true) {
+      throw new Error('google-email-not-verified')
+    }
     let user = db.users.find((u) => u.email === profile.email.toLowerCase())
     if (!user) {
       user = createUser({
@@ -429,20 +498,17 @@ app.post('/api/billing/trx', auth, (req, res) => {
   res.json(order)
 })
 
-function fulfill(order) {
-  const user = db.users.find((u) => u.email === order.email)
-  if (!user) return
-  if (order.kind === 'plan' && order.plan) user.plan = order.plan
-  if (order.pack) user.packs = Array.from(new Set([...(user.packs || []), order.pack]))
-  user.credits = (user.credits || 0) + (order.credits || 0)
-  order.status = 'paid'
-}
-
 app.post('/api/billing/confirm', auth, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' })
-  const order = db.orders.find((o) => o.id === req.body?.id)
-  if (!order) return res.status(404).json({ error: 'অর্ডার নেই' })
-  fulfill(order)
+  const result = fulfillPendingOrder(db, req.body?.id)
+  if (result.status === 'not-found') return res.status(404).json({ error: 'অর্ডার নেই' })
+  if (result.status === 'already-processed') {
+    return res.status(409).json({ error: 'এই অর্ডার ইতিমধ্যে প্রসেস করা হয়েছে' })
+  }
+  if (result.status !== 'fulfilled') {
+    return res.status(422).json({ error: 'অর্ডার বা ব্যবহারকারীর ক্রেডিট ডেটা যাচাই করা যায়নি' })
+  }
+  const { order } = result
   audit(db, req.user.email, 'order.paid', order.id)
   save(db)
   res.json(order)
